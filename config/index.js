@@ -3,6 +3,7 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 
 const path = require('path')
+var baseUrl = 'http://127.0.0.1:8088/jmonkey';
 
 module.exports = {
   dev: {
@@ -10,7 +11,22 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    proxyTable: {
+      '/auth': {
+        target: baseUrl,
+        changeOrigin: true,
+        pathRewrite: {
+          '^/auth': '/auth'
+        }
+      },
+      '/upms': {
+        target: baseUrl,
+        changeOrigin: true,
+        pathRewrite: {
+          '^/upms': '/upms'
+        }
+      }
+    },
 
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST
@@ -20,7 +36,7 @@ module.exports = {
     notifyOnErrors: true,
     poll: false, // https://webpack.js.org/configuration/dev-server/#devserver-watchoptions-
 
-    
+
     /**
      * Source Maps
      */

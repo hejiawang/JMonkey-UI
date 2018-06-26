@@ -34,7 +34,9 @@
 </template>
 
 <script>
+import { randomLenNum } from "@/utils/util";
 import { mapGetters } from "vuex";
+
 export default {
   name: "userlogin",
   data() {
@@ -55,7 +57,7 @@ export default {
         randomStr: ""
       },
       code: {
-        src: "/admin/code",
+        src: "/upms/code",
         value: "",
         len: 4,
         type: "image"
@@ -79,13 +81,17 @@ export default {
   created() {
     this.refreshCode();
   },
-  mounted() {},
   computed: {
     ...mapGetters(["tagWel"])
   },
   props: [],
   methods: {
     refreshCode() {
+      this.loginForm.code = "";
+      this.loginForm.randomStr = randomLenNum(this.code.len, true);
+      this.code.type == "text"
+        ? (this.code.value = randomLenNum(this.code.len))
+        : (this.code.src = `/upms/code/${this.loginForm.randomStr}`);
     },
     showPassword() {
       this.passwordType == ""
