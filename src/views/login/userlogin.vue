@@ -99,6 +99,11 @@ export default {
         : (this.passwordType = "");
     },
     handleLogin() {
+      this.$refs.loginForm.validate(valid => {
+        if (valid) {
+          this.$router.push({ path: "/index" });
+        }
+      });
     }
   }
 };
