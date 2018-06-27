@@ -9,13 +9,18 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'login',
-      component: login
+      name: '主页',
+      redirect: '/index'
     },
     {
       path: '/index',
       name: 'index',
       component: index,
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: login
     }
   ]
 })
