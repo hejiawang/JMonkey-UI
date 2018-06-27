@@ -101,14 +101,17 @@ export default {
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
-          this.$router.push({ path: "/index" });
+          this.$store.dispatch("LoginByUsername", this.loginForm).then(
+            res => {
+              this.$router.push({ path: "/index" });
+            },
+            error => {
+              this.refreshCode();
+            }
+          );
         }
       });
     }
   }
 };
 </script>
-
-<style>
-
-</style>
