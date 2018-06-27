@@ -49,7 +49,9 @@
           <el-breadcrumb-item>XX</el-breadcrumb-item>
         </el-breadcrumb>
         <el-main>
-          <router-view />
+          <transition name="el-zoom-in-top">
+            <router-view />
+          </transition>
         </el-main>
       </el-container>
 
