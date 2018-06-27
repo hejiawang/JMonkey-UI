@@ -8,8 +8,8 @@ const whiteList = ['/login', '/404', '/401'];
 
 router.beforeEach((to, from, next) => {
   NProgress.start();
-
-  if (store.getters.access_token) { //有token，已经登录过
+  next();
+  /*if (store.getters.access_token) { //有token，已经登录过
 
       if( to.path === '/login' ){
         next({ path: '/' });
@@ -25,7 +25,7 @@ router.beforeEach((to, from, next) => {
       next('/login');
       NProgress.done();
     }
-  }
+  }*/
 });
 
 router.afterEach((to, from) => {

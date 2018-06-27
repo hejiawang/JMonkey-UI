@@ -103,7 +103,7 @@ export default {
         if (valid) {
           this.$store.dispatch("LoginByUsername", this.loginForm).then(
             res => {
-              this.$router.push({ path: "/index" });
+              this.$router.push({ path: "/main" });
             },
             error => {
               this.refreshCode();

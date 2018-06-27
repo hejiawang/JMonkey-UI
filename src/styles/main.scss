@@ -1,0 +1,70 @@
+$aside-width: 200px;
+
+.el-header {
+  background-color: #00142a;
+  color: #333;
+  text-align: center;
+}
+.el-footer {
+  background-color: #f5f5f5;
+  color: #333;
+  text-align: center;
+  line-height: 35px;
+  position: absolute;
+  bottom: 0px;
+  left: $aside-width;
+  width: calc(100% - #{$aside-width});
+}
+.el-aside {
+  background-color: #00142a;
+  position: fixed;
+  bottom: 0px;
+  top: 60px;
+}
+.el-main {
+  color: #333;
+  position: absolute;
+  left: $aside-width;
+  top: 100px;
+  height: calc(100% - 100px);
+  width: calc(100% - #{$aside-width});
+  padding: 0px 20px;
+}
+
+
+.el-breadcrumb {
+  line-height: 40px;
+  background-color: #f5f5f5;
+  position: absolute;
+  left: $aside-width;
+  width: calc(100% - #{$aside-width} - 20px);
+  padding-left: 20px;
+}
+
+.el-pagination {
+  float: right;
+}
+
+.el-menu {
+  border-right: solid 0px
+}
+
+.el-menu-item-group .el-menu-item {
+  background-color: #002140 !important;
+}
+
+/*.el-menu-item:hover, .el-submenu .el-menu-item:hover, .el-submenu__title:hover {
+  background-color: #4A5064 !important;
+}
+
+.el-submenu .el-menu-item.is-active, .el-menu-item.is-active,
+.el-submenu .el-menu-item.is-active:hover, .el-menu-item.is-active:hover {
+  background-color: #4A5064 !important;
+  color: #fff !important;
+}*/
+.el-menu-item-group__title {
+  padding: 0px;
+}
+
+
+
