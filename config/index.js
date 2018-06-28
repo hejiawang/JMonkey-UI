@@ -3,7 +3,8 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 
 const path = require('path')
-var baseUrl = 'http://127.0.0.1:8088/jmonkey';
+//var baseUrl = 'http://114.116.89.11:8088/jmonkey';
+var baseUrl = 'http://localhost:8088/jmonkey';
 
 module.exports = {
   dev: {

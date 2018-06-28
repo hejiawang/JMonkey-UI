@@ -32,6 +32,7 @@ axios.interceptors.response.use(data => {
   NProgress.done();
 
   let errMsg = error.toString()
+  console.error("jmonkey request error:" + errMsg);
   let code = errMsg.substr(errMsg.indexOf('code') + 5)
   Message({
     message: errorCode[code] || errorCode['default'],

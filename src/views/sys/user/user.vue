@@ -47,8 +47,8 @@
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
-          <el-button @click="cancelUserForm('userForm')">取 消</el-button>
-          <el-button type="primary" @click="createUser('userForm')">确 定</el-button>
+          <el-button v-waves @click="cancelUserForm('userForm')">取 消</el-button>
+          <el-button v-waves type="primary" @click="createUser('userForm')">确 定</el-button>
         </div>
       </el-dialog>
     </div>
@@ -56,6 +56,7 @@
 </template>
 <script>
   import waves from "@/directive/waves/index.js";
+  import {save} from "@/api/sys/user";
 
   export default {
     name: "user",
@@ -92,7 +93,7 @@
         },
         userRules: {
           username: [
-            { required: true, message: "请输入账户", trigger: "blur" },
+            { required: true, message: "请输入用户名称", trigger: "blur" },
             { min: 3, max: 20, message: "长度在 3 到 20 个字符", trigger: "blur" }
           ],
           password: [
@@ -120,8 +121,10 @@
         this.$refs[formName].validate(valid => {
           if (valid) {
             console.info(this.userForm);
-            this.userDialogFormVisible = false;
-            this.$notify({ title: "成功", message: "创建成功", type: "success", duration: 2000 });
+            save(this.userForm).then(() => {
+              this.userDialogFormVisible = false;
+              this.$notify({ title: "成功", message: "创建成功", type: "success", duration: 2000 });
+            });
           }
         })
       },
