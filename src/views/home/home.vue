@@ -1,13 +1,13 @@
 <template>
   <el-container>
     <div class="main-container">
-      <el-row style="margin: 20px 0px;">
-        <el-button @click="dialogFormVisible = true">默认按钮</el-button>
-        <el-button type="primary" @click="getTestTableSelect">主要按钮</el-button>
-        <el-button type="success">成功按钮</el-button>
-        <el-button type="info">信息按钮</el-button>
-        <el-button type="warning">警告按钮</el-button>
-        <el-button type="danger">危险按钮</el-button>
+      <el-row class="main-btn-group">
+        <el-button v-waves @click="dialogFormVisible = true">默认按钮</el-button>
+        <el-button v-waves type="primary" @click="getTestTableSelect">主要按钮</el-button>
+        <el-button v-waves type="success">成功按钮</el-button>
+        <el-button v-waves type="info">信息按钮</el-button>
+        <el-button v-waves type="warning">警告按钮</el-button>
+        <el-button v-waves type="danger">危险按钮</el-button>
       </el-row>
 
       <el-table :data="tableData" ref="testTable" height="calc(100% - 80px)" tooltip-effect="dark"
@@ -59,8 +59,13 @@
   </el-container>
 </template>
 <script>
+  import waves from "@/directive/waves/index.js";
+
   export default {
     name: "home",
+    directives: {
+      waves
+    },
     data () {
       const item = [
         {

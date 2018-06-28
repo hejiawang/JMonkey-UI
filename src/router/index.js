@@ -3,9 +3,9 @@ import Router from 'vue-router'
 import login from '@/views/login/index'
 import main from '@/components/layout/main'
 import home from '@/views/home/home'
-import user from '@/views/sys/user'
-import menu from '@/views/sys/menu'
-import role from '@/views/sys/role'
+import user from '@/views/sys/user/user'
+import menu from '@/views/sys/menu/menu'
+import role from '@/views/sys/role/role'
 
 Vue.use(Router)
 

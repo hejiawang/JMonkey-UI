@@ -34,6 +34,9 @@ $aside-width: 200px;
     .main-container {
       height: calc(100% - 35px);
       width: 100%;
+      .main-btn-group {
+        margin: 20px 0px;
+      }
     }
   }
 }
