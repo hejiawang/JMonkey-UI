@@ -1,10 +1,14 @@
 <template>
   <el-container>
     <div class="main-container">
+
+      <!-- 功能按钮 start -->
       <el-row class="main-btn-group">
         <el-button v-waves type="primary" @click="handleCreateUser">新增用户</el-button>
       </el-row>
+      <!-- 功能按钮 end -->
 
+      <!-- 列表 start -->
       <el-table :data="userTableData" ref="testTable" height="calc(100% - 80px)" tooltip-effect="dark" v-loading="listLoading">
 
         <el-table-column prop="username" label="姓名" show-overflow-tooltip/>
@@ -17,16 +21,21 @@
 
         <el-table-column fixed="right" label="操作" width="300" align="center">
           <template slot-scope="scope">
-            <el-button size="mini" type="success" v-waves>编辑</el-button>
+            <el-button size="mini" type="success" v-waves @click="handleModifyUser(scope.row)">编辑</el-button>
             <el-button size="mini" type="danger" v-waves @click="deleteUser(scope.row)">删除</el-button>
           </template>
         </el-table-column>
 
       </el-table>
+      <!-- 列表 end -->
 
+      <!-- 分页 start -->
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="listQuery.current" :page-sizes="[10,20,30,50]" :page-size="listQuery.size" layout="total, sizes, prev, pager, next, jumper" :total="listTotal" />
+      <!-- 分页 end -->
 
+      <!-- 新增修改用户 start -->
       <el-dialog :title="textMap[userDialogStatus]" :visible.sync="userDialogFormVisible">
+
         <el-form :model="userForm" :rules="userRules" ref="userForm" label-width="100px">
 
           <el-form-item label="用户名称" prop="username">
@@ -50,17 +59,21 @@
 
           </el-form-item>
         </el-form>
+
         <div slot="footer" class="dialog-footer">
           <el-button v-waves @click="cancelUserForm('userForm')">取 消</el-button>
-          <el-button v-waves type="primary" @click="createUser('userForm')">确 定</el-button>
+          <el-button v-waves type="primary" v-if=" userDialogStatus == 'createUser' " @click="createUser('userForm')">确 定</el-button>
+          <el-button v-waves type="primary" v-else @click="modifyUser('userForm')">修 改</el-button>
         </div>
       </el-dialog>
+      <!-- 新增修改用户 end -->
+
     </div>
   </el-container>
 </template>
 <script>
   import waves from "@/directive/waves/index.js"; //按钮水波纹效果
-  import { list, save, del } from "@/api/sys/user";
+  import { list, find, save, modify, del } from "@/api/sys/user";
 
   export default {
     name: "user",
@@ -144,13 +157,7 @@
         this.listQuery.current = val;
         this.userList();
       },
-      /**
-       * 显示新增用户dialog
-       */
-      handleCreateUser(){
-        this.userDialogStatus = "createUser";
-        this.userDialogFormVisible = true;
-      },
+
       /**
        * 删除用户
        * @param row
@@ -166,13 +173,49 @@
         });
       },
       /**
+       * 修改用户 dialog
+       * @param row
+       */
+      handleModifyUser( row ){
+        this.restUserForm();
+
+        find( row.id ).then( data => {
+          this.userForm = data.result;
+
+          this.userDialogStatus = "modifyUser";
+          this.userDialogFormVisible = true;
+        });
+      },
+      /**
+       * 修改用户
+       * @param formName
+       */
+      modifyUser(formName){
+        this.$refs[formName].validate(valid => {
+          if (valid) {
+            modify(this.userForm).then(() => {
+              this.cancelUserForm(formName);
+              this.userList();
+              this.$notify({ title: "成功", message: "修改成功", type: "success", duration: 2000 });
+            });
+          }
+        })
+      },
+      /**
+       * 显示新增用户dialog
+       */
+      handleCreateUser(){
+        this.restUserForm();
+        this.userDialogStatus = "createUser";
+        this.userDialogFormVisible = true;
+      },
+      /**
        * 新增用户
        * @param formName
        */
       createUser(formName){
         this.$refs[formName].validate(valid => {
           if (valid) {
-            console.info(this.userForm);
             save(this.userForm).then(() => {
               this.cancelUserForm(formName);
               this.userList();
@@ -187,8 +230,20 @@
        */
       cancelUserForm(formName){
         this.userDialogFormVisible = false;
+        this.restUserForm();
         this.$refs[formName].resetFields();
       },
+      /**
+       * 重置userForm
+       */
+      restUserForm(){
+        this.userForm = { //user form
+          username: "",
+          password: "",
+          phone: "",
+          sex: "Man"
+        }
+      }
     }
   };
 </script>

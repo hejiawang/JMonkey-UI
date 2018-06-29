@@ -13,6 +13,17 @@ export function list( query ) {
 }
 
 /**
+ * 获取用户信息
+ * @param id 用户ID
+ */
+export function find(id) {
+  return request({
+    url: '/upms/user/find/' + id,
+    method: 'get'
+  })
+}
+
+/**
  * 保存用户信息
  * @param obj 用户信息
  */
@@ -20,6 +31,18 @@ export function save(obj) {
   return request({
     url: '/upms/user/save',
     method: 'post',
+    data: obj
+  })
+}
+
+/**
+ * 修改用户信息
+ * @param obj 用户信息
+ */
+export function modify(obj) {
+  return request({
+    url: '/upms/user/modify',
+    method: 'put',
     data: obj
   })
 }
