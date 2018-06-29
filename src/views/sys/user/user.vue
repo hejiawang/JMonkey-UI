@@ -9,7 +9,7 @@
       <!-- 功能按钮 end -->
 
       <!-- 列表 start -->
-      <el-table :data="userTableData" ref="testTable" height="calc(100% - 80px)" tooltip-effect="dark" v-loading="listLoading">
+      <el-table :data="userTableData" ref="userTable" height="calc(100% - 80px)" tooltip-effect="dark" v-loading="listLoading">
 
         <el-table-column prop="username" label="姓名" show-overflow-tooltip/>
         <el-table-column prop="phone" label="电话" show-overflow-tooltip/>
@@ -39,11 +39,11 @@
         <el-form :model="userForm" :rules="userRules" ref="userForm" label-width="100px">
 
           <el-form-item label="用户名称" prop="username">
-            <el-input v-model="userForm.username" placeholder="请输入用户名"></el-input>
+            <el-input v-model="userForm.username" placeholder="请输入用户名称"></el-input>
           </el-form-item>
 
           <el-form-item label="登录密码" prop="password">
-            <el-input v-model="userForm.password" placeholder="请输入密码"></el-input>
+            <el-input v-model="userForm.password" placeholder="请输入登录密码"></el-input>
           </el-form-item>
 
           <el-form-item label="手机号码" prop="phone">
