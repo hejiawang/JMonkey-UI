@@ -10,6 +10,7 @@ NProgress.configure({ showSpinner: false });
 
 axios.defaults.timeout = 30000; //超时时间
 axios.defaults.withCredentials = true;  // 跨域请求，允许保存cookie
+axios.defaults.headers.post['Content-Type'] = 'application/json';
 
 /**
  * HTTPrequest拦截
@@ -27,7 +28,7 @@ axios.interceptors.request.use(config => {
  */
 axios.interceptors.response.use(data => {
   NProgress.done();
-  return data;
+  return data.data;
 }, error => {
   NProgress.done();
 
