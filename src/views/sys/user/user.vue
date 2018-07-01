@@ -103,14 +103,11 @@
        * @param value
        * @param callback
        */
-      var validUsername = ( rule, value,callback ) => {
+      var validUsername = ( rule, value, callback ) => {
         var id = this.userForm.id ? this.userForm.id : null;
         checkUserName( id, value ).then(data => {
-          if( data.result ) {
-            callback(new Error('用户名称已存在'))
-          } else {
-            callback()
-          }
+          if( data.result ) callback(new Error('用户名称已存在'))
+          else callback()
         });
       };
 
@@ -141,7 +138,7 @@
             { validator: validUsername, trigger: 'blur' }
           ],
           password: [
-            { required: true, message: "请输入密码", trigger: "blur" },
+            { required: true, message: "请输入登录密码", trigger: "blur" },
             { min: 6, max: 20, message: "长度在 6 到 20 个字符", trigger: "blur" }
           ],
           phone: [

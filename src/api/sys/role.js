@@ -57,3 +57,30 @@ export function del(id) {
     method: 'delete'
   })
 }
+
+/**
+ * 校验角色code是否存在
+ * @param id 角色ID
+ * @param code 角色Code
+ */
+export function checkCode( id, code) {
+  return request({
+    url: '/upms/role/checkCode',
+    data: {
+      id: id,
+      code: code
+    },
+    method: 'post'
+  })
+}
+
+export function checkName( id, name) {
+  return request({
+    url: '/upms/role/checkName',
+    data: {
+      id: id,
+      name: name
+    },
+    method: 'post'
+  })
+}

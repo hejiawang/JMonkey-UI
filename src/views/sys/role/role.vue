@@ -72,7 +72,7 @@
 </template>
 <script>
   import waves from "@/directive/waves/index.js"; //按钮水波纹效果
-  import { list, find, save, modify, del } from "@/api/sys/role";
+  import { list, find, save, modify, del, checkCode, checkName } from "@/api/sys/role";
 
   export default {
     name: "role",
@@ -80,6 +80,33 @@
       waves
     },
     data () {
+      /**
+       * 校验角色名称是否存在
+       * @param rule
+       * @param value
+       * @param callback
+       */
+      var validName = ( rule, value, callback ) => {
+        var id = this.roleForm.id ? this.roleForm.id : null;
+        checkName( id, value ).then(data => {
+          if( data.result ) callback(new Error('角色名称已存在'))
+          else callback()
+        });
+      };
+      /**
+       * 校验角色编码是否存在
+       * @param rule
+       * @param value
+       * @param callback
+       */
+      var validCode = ( rule, value, callback ) => {
+        var id = this.roleForm.id ? this.roleForm.id : null;
+        checkCode( id, value ).then(data => {
+          if( data.result ) callback(new Error('角色编码已存在'))
+          else callback()
+        });
+      }
+
       return {
         listLoading: false,  //页面是否在加载
         roleDialogFormVisible: false, //是否显示角色 dialog
@@ -102,11 +129,13 @@
         roleRules: {  //user form rule
           name: [
             { required: true, message: "请输入角色名称", trigger: "blur" },
-            { min: 1, max: 20, message: "长度在 1 到 20 个字符", trigger: "blur" }
+            { min: 1, max: 20, message: "长度在 1 到 20 个字符", trigger: "blur" },
+            { validator: validName, trigger: 'blur' }
           ],
           code: [
             { required: true, message: "请输入角色编码", trigger: "blur" },
-            { min: 1, max: 20, message: "长度在 1 到 20 个字符", trigger: "blur" }
+            { min: 1, max: 20, message: "长度在 1 到 20 个字符", trigger: "blur" },
+            { validator: validCode, trigger: 'blur' }
           ],
           remark: [
             { max: 100, message: "长度在 1 到 100 个字符", trigger: "blur" }
