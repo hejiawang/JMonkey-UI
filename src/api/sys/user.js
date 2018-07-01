@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import user from "../../store/modules/user";
 
 /**
  * 用户列表数据
@@ -55,5 +56,21 @@ export function del(id) {
   return request({
     url: '/upms/user/delete/' + id,
     method: 'delete'
+  })
+}
+
+/**
+ * 校验用户名是否存在
+ * @param id 用户ID
+ * @param userName 用户名称
+ */
+export function checkUserName( id, userName ) {
+  return request({
+    url: '/upms/user/checkUserName',
+    data: {
+      id: id,
+      username: userName
+    },
+    method: 'post',
   })
 }

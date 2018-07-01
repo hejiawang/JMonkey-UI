@@ -9,6 +9,7 @@ import 'element-ui/lib/theme-chalk/index.css'
 import '@/styles/index.scss'
 import store from './store'
 import 'babel-polyfill'
+import * as filters from './filters' //全局filter
 import './permission' // 权限
 
 Vue.config.productionTip = false
@@ -16,6 +17,10 @@ Vue.config.productionTip = false
 Vue.use(ElementUI, { size: 'medium' })
 Vue.use(VueMoment)
 Vue.use(VueAxios, axios)
+
+Object.keys(filters).forEach(key => {
+  Vue.filter(key, filters[key])
+})
 
 new Vue({
   el: '#app',

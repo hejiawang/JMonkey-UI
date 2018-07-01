@@ -14,7 +14,12 @@
         <el-table-column prop="name" label="角色名称" show-overflow-tooltip/>
         <el-table-column prop="code" label="角色编码" show-overflow-tooltip/>
         <el-table-column prop="remark" label="角色描述" show-overflow-tooltip/>
-        <el-table-column prop="createDate" label="创建时间" show-overflow-tooltip/>
+        <el-table-column prop="createDate" label="创建时间" show-overflow-tooltip>
+          <template slot-scope="scope">
+            <i class="el-icon-time"></i>
+            <span>{{scope.row.createDate | parseTime }}</span>
+          </template>
+        </el-table-column>
 
         <el-table-column fixed="right" label="操作" width="300" align="center">
           <template slot-scope="scope">
@@ -33,16 +38,23 @@
       <!-- 新增修改角色 start -->
       <el-dialog :title="textMap[roleDialogStatus]" :visible.sync="roleDialogFormVisible">
 
-        <el-form :model="roleForm" :rules="roleRules" ref="userForm" label-width="100px">
+        <el-form :model="roleForm" :rules="roleRules" ref="roleForm" label-width="100px">
 
-          <el-form-item label="角色名称" prop="name">
-            <el-input v-model="roleForm.name" placeholder="请输入角色名称"></el-input>
-          </el-form-item>
-          <el-form-item label="角色编码" prop="code">
-            <el-input v-model="roleForm.code" placeholder="请输入角色编码"></el-input>
-          </el-form-item>
+          <el-row>
+            <el-col :span="12">
+              <el-form-item label="角色名称" prop="name">
+                <el-input v-model="roleForm.name" placeholder="请输入角色名称" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="角色编码" prop="code">
+                <el-input v-model="roleForm.code" placeholder="请输入角色编码" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+
           <el-form-item label="角色描述" prop="remark">
-            <el-input v-model="roleForm.remark" placeholder="请输入角色描述"></el-input>
+            <el-input v-model="roleForm.remark" type="textarea" :rows="2"/>
           </el-form-item>
 
         </el-form>
@@ -63,6 +75,160 @@
   import { list, find, save, modify, del } from "@/api/sys/role";
 
   export default {
-    name: "role"
+    name: "role",
+    directives: {
+      waves
+    },
+    data () {
+      return {
+        listLoading: false,  //页面是否在加载
+        roleDialogFormVisible: false, //是否显示角色 dialog
+        roleTableData: null,   //角色列表数据
+        roleDialogStatus: "", //role dialog 状态 新增或者修改角色
+        textMap: {  //显示文字
+          createRole: "新增角色",
+          modifyRole: "修改角色"
+        },
+        listTotal: null,  //用户列表总条数
+        listQuery: {  //用户列表分页条件
+          current: 1,
+          size: 10
+        },
+        roleForm: {   //role form
+          name: "",
+          code: "",
+          remark: ""
+        },
+        roleRules: {  //user form rule
+          name: [
+            { required: true, message: "请输入角色名称", trigger: "blur" },
+            { min: 1, max: 20, message: "长度在 1 到 20 个字符", trigger: "blur" }
+          ],
+          code: [
+            { required: true, message: "请输入角色编码", trigger: "blur" },
+            { min: 1, max: 20, message: "长度在 1 到 20 个字符", trigger: "blur" }
+          ],
+          remark: [
+            { max: 100, message: "长度在 1 到 100 个字符", trigger: "blur" }
+          ]
+        }
+      }
+    },
+    created() {
+      this.roleList();
+    },
+    methods: {
+      /**
+       * 角色列表数据
+       */
+      roleList(){
+        this.listLoading = true;
+        list(this.listQuery).then(data => {
+          this.listTotal = data.total;
+          this.roleTableData = data.rows;
+
+          this.listLoading = false;
+        });
+      },
+      /**
+       * 分页插件——每页数量变化
+       */
+      handleSizeChange( val ){
+        this.listQuery.size = val;
+        this.roleList();
+      },
+      /**
+       * 分页插件——当前页变化
+       */
+      handleCurrentChange( val ){
+        this.listQuery.current = val;
+        this.roleList();
+      },
+      /**
+       * 删除角色
+       * @param row
+       */
+      deleteRole( row ){
+        this.$confirm( "此操作将永久删除该角色(角色名:" + row.name + "), 是否继续?", "提示",
+          { confirmButtonText: "确定", cancelButtonText: "取消", type: "warning" }
+        ).then(() => {
+          del(row.id).then(( result ) => {
+            this.roleList();
+            this.$notify({ title: "成功", message: "删除成功", type: "success", duration: 2000 });
+          });
+        });
+      },
+      /**
+       * 显示新增角色dialog
+       */
+      handleCreateRole(){
+        this.restRoleForm();
+        this.roleDialogStatus = "createRole";
+        this.roleDialogFormVisible = true;
+      },
+      /**
+       * 新增角色
+       * @param formName
+       */
+      createRole(formName){
+        this.$refs[formName].validate(valid => {
+          if (valid) {
+            save(this.roleForm).then(() => {
+              this.cancelRoleForm(formName);
+              this.roleList();
+              this.$notify({ title: "成功", message: "创建成功", type: "success", duration: 2000 });
+            });
+          }
+        })
+      },
+      /**
+       * 修改角色 dialog
+       * @param row
+       */
+      handleModifyRole( row ){
+        this.restRoleForm();
+
+        find( row.id ).then( data => {
+          this.roleForm = data.result;
+
+          this.roleDialogStatus = "modifyRole";
+          this.roleDialogFormVisible = true;
+        });
+      },
+      /**
+       * 修改角色
+       * @param formName
+       */
+      modifyRole(formName){
+        this.$refs[formName].validate(valid => {
+          if (valid) {
+            modify(this.roleForm).then(() => {
+              this.cancelRoleForm(formName);
+              this.roleList();
+              this.$notify({ title: "成功", message: "修改成功", type: "success", duration: 2000 });
+            });
+          }
+        })
+      },
+      /**
+       * role dialog
+       * @param formName
+       */
+      cancelRoleForm(formName){
+        this.roleDialogFormVisible = false;
+        this.restRoleForm();
+        this.$refs[formName].resetFields();
+      },
+      /**
+       * 重置roleForm
+       */
+      restRoleForm(){
+        this.roleForm = {
+          name: "",
+          code: "",
+          remark: ""
+        }
+      }
+    }
   };
 </script>

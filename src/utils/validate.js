@@ -14,3 +14,13 @@ export function validatenull(val) {
   }
   return false;
 };
+
+/**
+ * 校验手机号格式
+ * @param str
+ * @returns {boolean}
+ */
+export function validatePhone(str) {
+  const reg = /^1[3|4|5|7|8][0-9]\d{8}$/
+  return reg.test(str)
+};

@@ -39,15 +39,15 @@
         <el-form :model="userForm" :rules="userRules" ref="userForm" label-width="100px">
 
           <el-form-item label="用户名称" prop="username">
-            <el-input v-model="userForm.username" placeholder="请输入用户名称"></el-input>
+            <el-input v-model="userForm.username" placeholder="请输入用户名称" />
           </el-form-item>
 
           <el-form-item label="登录密码" prop="password">
-            <el-input v-model="userForm.password" placeholder="请输入登录密码"></el-input>
+            <el-input v-model="userForm.password" placeholder="请输入登录密码" type="password" />
           </el-form-item>
 
           <el-form-item label="手机号码" prop="phone">
-            <el-input v-model="userForm.phone" placeholder="请输入手机号码"></el-input>
+            <el-input v-model="userForm.phone" placeholder="请输入手机号码" />
           </el-form-item>
 
           <el-form-item label="用户性别" prop="sex">
@@ -73,7 +73,8 @@
 </template>
 <script>
   import waves from "@/directive/waves/index.js"; //按钮水波纹效果
-  import { list, find, save, modify, del } from "@/api/sys/user";
+  import { list, find, save, modify, del, checkUserName } from "@/api/sys/user";
+  import { validatePhone } from  "@/utils/validate";
 
   export default {
     name: "user",
@@ -81,6 +82,38 @@
       waves
     },
     data () {
+      /**
+       * 校验手机号
+       * @param rule
+       * @param value
+       * @param callback
+       */
+      var validPhone = ( rule, value,callback ) => {
+        if (!value){
+          callback(new Error('请输入手机号码'))
+        } else if (!validatePhone(value)){
+          callback(new Error('请输入正确的11位手机号码'))
+        } else {
+          callback()
+        }
+      };
+      /**
+       * 校验用户名是否存在
+       * @param rule
+       * @param value
+       * @param callback
+       */
+      var validUsername = ( rule, value,callback ) => {
+        var id = this.userForm.id ? this.userForm.id : null;
+        checkUserName( id, value ).then(data => {
+          if( data.result ) {
+            callback(new Error('用户名称已存在'))
+          } else {
+            callback()
+          }
+        });
+      };
+
       return {
         listLoading: false,  //页面是否在加载
         userDialogFormVisible: false, //是否显示user dialog
@@ -104,15 +137,15 @@
         userRules: {  //user form rule
           username: [
             { required: true, message: "请输入用户名称", trigger: "blur" },
-            { min: 3, max: 20, message: "长度在 3 到 20 个字符", trigger: "blur" }
+            { min: 3, max: 20, message: "长度在 3 到 20 个字符", trigger: "blur" },
+            { validator: validUsername, trigger: 'blur' }
           ],
           password: [
             { required: true, message: "请输入密码", trigger: "blur" },
             { min: 6, max: 20, message: "长度在 6 到 20 个字符", trigger: "blur" }
           ],
           phone: [
-            { required: true, message: "请输入手机号码", trigger: "blur" },
-            { min: 11, max: 11, message: "请输入正确的11位手机号码", trigger: "blur" }
+            { required: true, trigger: 'blur', validator: validPhone }
           ],
         }
       }
@@ -157,7 +190,6 @@
         this.listQuery.current = val;
         this.userList();
       },
-
       /**
        * 删除用户
        * @param row
