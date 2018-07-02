@@ -8,6 +8,7 @@
       </el-row>
       <!-- 功能按钮 end -->
 
+      <!-- 树形列表 start -->
       <el-table :data="formatMenuTreeData" ref="menuTable" height="calc(100% - 80px)" tooltip-effect="dark" :row-style="showRow">
         <el-table-column prop="name" label="名称" show-overflow-tooltip width="200">
           <template slot-scope="scope">
@@ -32,6 +33,9 @@
         <el-table-column prop="component" label="VUE页面" show-overflow-tooltip/>
 
       </el-table>
+      <!-- 树形列表 end -->
+
+
     </div>
   </el-container>
 </template>
