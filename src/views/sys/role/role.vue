@@ -126,7 +126,7 @@
           code: "",
           remark: ""
         },
-        roleRules: {  //user form rule
+        roleRules: {  //role form rule
           name: [
             { required: true, message: "请输入角色名称", trigger: "blur" },
             { min: 1, max: 20, message: "长度在 1 到 20 个字符", trigger: "blur" },
