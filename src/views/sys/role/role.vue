@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <div class="main-container">
+    <div class="main-container" :style="mainStyle">
 
       <!-- 功能按钮 start -->
       <el-row class="main-btn-group">
@@ -25,6 +25,7 @@
           <template slot-scope="scope">
             <el-button size="mini" type="success" v-waves @click="handleModifyRole(scope.row)">编辑</el-button>
             <el-button size="mini" type="danger" v-waves @click="deleteRole(scope.row)">删除</el-button>
+            <el-button size="mini" type="warning" v-waves @click="authorizeTag(scope.row)">授权</el-button>
           </template>
         </el-table-column>
 
@@ -68,11 +69,16 @@
       <!-- 新增修改角色 end -->
 
     </div>
+    <div class="main-container" :style="authorizeStyle">
+      <el-tree :data="menuTreeDate" node-key="id" highlight-current :props="menuTreeProps" show-checkbox>
+      </el-tree>
+    </div>
   </el-container>
 </template>
 <script>
   import waves from "@/directive/waves/index.js"; //按钮水波纹效果
   import { list, find, save, modify, del, checkCode, checkName } from "@/api/sys/role";
+  import { treeList } from "@/api/sys/menu";
 
   export default {
     name: "role",
@@ -140,11 +146,20 @@
           remark: [
             { max: 100, message: "长度在 1 到 100 个字符", trigger: "blur" }
           ]
-        }
+        },
+        mainStyle: "width: 100%",
+        authorizeStyle: "display: none;",
+        menuTreeProps: {
+          children: "children",
+          label: "name"
+        },
+        menuTreeDate: [],
+        authorizeRole: null,
       }
     },
     created() {
       this.roleList();
+      this.menuTreeList();
     },
     methods: {
       /**
@@ -157,6 +172,11 @@
           this.roleTableData = data.rows;
 
           this.listLoading = false;
+        });
+      },
+      menuTreeList(){
+        treeList().then(data => {
+          this.menuTreeDate = data.result;
         });
       },
       /**
@@ -257,7 +277,33 @@
           code: "",
           remark: ""
         }
+      },
+      authorizeTag( row ){
+        this.authorizeRole = row;
+
+        this.mainStyle = "animation:divShow 1s;-webkit-animation:divShow 1s;";
+        this.authorizeStyle = "animation:tagShow 1s;-webkit-animation:tagShow 1s; padding: 76px 50px 0px 50px; height: calc(100% - 76px);";
       }
     }
   };
 </script>
+
+<style lang="scss">
+  @keyframes divShow {
+    0%   { width:100%;}
+    100% { width:60%;}
+  }
+  @-webkit-keyframes divShow {
+    0%   { width:100%;}
+    100% { width:60%;}
+  }
+
+  @keyframes tagShow {
+    0%   { width:0%;}
+    100% { width:40%;}
+  }
+  @-webkit-keyframes tagShow {
+    0%   { width:0%;}
+    100% { width:40%;}
+  }
+</style>

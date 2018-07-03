@@ -10,7 +10,7 @@
 
       <!-- 树形列表 start -->
       <el-table :data="formatMenuTreeData" ref="menuTable" height="calc(100% - 80px)" tooltip-effect="dark" :row-style="showRow" v-loading="listLoading">
-        <el-table-column prop="name" label="名称" show-overflow-tooltip width="200">
+        <el-table-column prop="name" label="名称" show-overflow-tooltip width="300">
           <template slot-scope="scope">
             <span v-for="space in scope.row._level" class="ms-tree-space" :key="space"></span>
 
@@ -130,8 +130,8 @@
       <!-- 新增修改菜单 start -->
 
       <!-- 选择父级菜单 start -->
-      <el-dialog title="父级菜单" :visible.sync="menuDialogTreeVisible" width="300px">
-        <el-tree :data="treeDate" node-key="id" highlight-current :props="treeProps" >
+      <el-dialog title="父级菜单" :visible.sync="menuDialogTreeVisible" width="500px">
+        <el-tree :data="treeDate" node-key="id" highlight-current :props="treeProps" @node-click="getParentMenu">
         </el-tree>
       </el-dialog>
       <!-- 选择父级菜单 end -->
@@ -164,13 +164,7 @@
           children: "children",
           label: "name"
         },
-        treeDate: [
-          { id: 0, name: '首页', type: '菜单', icon: '无', sort: '1', permission: 'home', method: 'GET', url: '/home', path: '/home', component: 'home.vue'},
-          { id: 1, name: '系统设置', type: '菜单', icon: '无', sort: '2', permission: 'sys', method: 'GET', url: '', path: '', component: '', children: [
-            { id: 2, name: '用户管理', type: '菜单', icon: '无', sort: '3', permission: 'sys_user', method: 'GET', url: '/sys/user', path: '/sys/user', component: 'user/user.vue' },
-            { id: 3, name: '角色管理', type: '菜单', icon: '无', sort: '2', permission: 'sys', method: 'GET', url: '', path: '', component: ''},
-          ]},
-        ],
+        treeDate: [],
         menuForm: {   //menu form
           name: "",
           permission: "",
@@ -211,11 +205,10 @@
       menuTreeList(){
         this.listLoading = true;
 
-        /*treeList().then(data => {
+        treeList().then(data => {
           this.treeDate = data.result;
           this.listLoading = false;
-        });*/
-        this.listLoading = false;
+        });
       },
       /**
        * 删除菜单
@@ -322,7 +315,7 @@
        * @param row
        * @returns {string}
        */
-      showRow: function(row) {
+      showRow(row) {
         const show = (row.row.parent ? (row.row.parent._expanded && row.row.parent._show) : true)
         row.row._show = show
         return show ? 'animation:treeTableShow 1s;-webkit-animation:treeTableShow 1s;' : 'display:none;'
@@ -331,15 +324,21 @@
        * 展示/隐藏 菜单树形表格行数据
        * @param trIndex
        */
-      toggleExpanded: function(trIndex) {
+      toggleExpanded(trIndex) {
         const record = this.formatMenuTreeData[trIndex]
         record._expanded = !record._expanded
       },
       /**
        * 显示父级菜单树
        */
-      handleMenuTree: function () {
+      handleMenuTree() {
         this.menuDialogTreeVisible = true;
+      },
+      getParentMenu(data){
+        this.menuDialogTreeVisible = false;
+
+        this.menuForm.parentId = data.id;
+        this.menuForm.parentName = data.name;
       }
     }
   };
