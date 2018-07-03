@@ -48,20 +48,26 @@
           <el-row>
             <el-col :span="12">
               <el-form-item label="父级菜单" prop="parentId">
-                <el-input v-model="menuForm.parentId" placeholder="请输入父级菜单" />
+                <el-input v-model="menuForm.parentName" placeholder="请输入父级菜单" @focus="handleMenuTree()" readonly/>
+                <el-input v-model="menuForm.parentId" type="hidden" style="display: none"/>
               </el-form-item>
             </el-col>
             <el-col :span="12">
               <el-form-item label="菜单名称" prop="name">
-                <el-input v-model="menuForm.name" placeholder="请输入菜单名称" />
+                <el-input v-model="menuForm.name" placeholder="请输入菜单名称" minlength="1" maxlength="6"/>
               </el-form-item>
             </el-col>
           </el-row>
           <el-row>
-            <el-col :span="12">
+            <el-col :span="11">
               <el-form-item label="权限标识" prop="permission">
                 <el-input v-model="menuForm.permission" placeholder="请输入权限标识" />
               </el-form-item>
+            </el-col>
+            <el-col :span="1" style="text-align: center;">
+              <el-tooltip class="item" effect="light" content="例：sys_user_save" placement="bottom-start">
+                <i class="el-icon-question message-info"></i>
+              </el-tooltip>
             </el-col>
             <el-col :span="12">
               <el-form-item label="菜单图标" prop="icon">
@@ -72,19 +78,27 @@
           <el-row>
             <el-col :span="12">
               <el-form-item label="菜单类型" prop="type">
-                <el-input v-model="menuForm.type" placeholder="请输入菜单类型" />
+                <el-radio-group v-model="menuForm.type">
+                  <el-radio border label="Menu">菜单</el-radio>
+                  <el-radio border label="Button">按钮</el-radio>
+                </el-radio-group>
               </el-form-item>
             </el-col>
             <el-col :span="12">
               <el-form-item label="菜单排序" prop="sort">
-                <el-input v-model="menuForm.sort" placeholder="请输入菜单排序" />
+                <el-input-number v-model="menuForm.sort" :min="1" :max="10000" />
               </el-form-item>
             </el-col>
           </el-row>
           <el-row>
             <el-col :span="12">
               <el-form-item label="请求方法" prop="method">
-                <el-input v-model="menuForm.method" placeholder="请输入请求方法" />
+                <el-select v-model="menuForm.method" filterable placeholder="请选择">
+                  <el-option  key="Get" label="Get" value="Get" />
+                  <el-option  key="Post" label="Post" value="Post" />
+                  <el-option  key="Put" label="Put" value="Put" />
+                  <el-option  key="Delete" label="Delete" value="Delete" />
+                </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="12">
@@ -114,6 +128,13 @@
         </div>
       </el-dialog>
       <!-- 新增修改菜单 start -->
+
+      <!-- 选择父级菜单 start -->
+      <el-dialog title="父级菜单" :visible.sync="menuDialogTreeVisible" width="300px">
+        <el-tree :data="treeDate" node-key="id" highlight-current :props="treeProps" >
+        </el-tree>
+      </el-dialog>
+      <!-- 选择父级菜单 end -->
     </div>
   </el-container>
 </template>
@@ -132,11 +153,16 @@
     data() {
       return {
         listLoading: false,  //页面是否在加载
+        menuDialogTreeVisible: false,  //父级菜单树dislog
         menuDialogFormVisible: false, //是否显示菜单 dialog
         menuDialogStatus: "", //menu dialog 状态 新增或者修改菜单
         textMap: {  //显示文字
           createMenu: "新增菜单",
           modifyMenu: "修改菜单"
+        },
+        treeProps: {
+          children: "children",
+          label: "name"
         },
         treeDate: [
           { id: 0, name: '首页', type: '菜单', icon: '无', sort: '1', permission: 'home', method: 'GET', url: '/home', path: '/home', component: 'home.vue'},
@@ -150,15 +176,19 @@
           permission: "",
           path: "",
           url: "",
-          method: "",
+          method: "Get",
           parentId: "",
+          parentName: "",
           icon: "",
           component: "",
-          sort: "",
-          type: ""
+          sort: 1,
+          type: "Menu"
         },
         menuRules: {  //menu form rule
-
+          name: [
+            { required: true, message: "请输入菜单名称", trigger: "blur" },
+            { min: 1, max: 6, message: "长度在 1 到 6 个字符", trigger: "blur" }
+          ]
         }
       }
     },
@@ -180,6 +210,12 @@
        */
       menuTreeList(){
         this.listLoading = true;
+
+        /*treeList().then(data => {
+          this.treeDate = data.result;
+          this.listLoading = false;
+        });*/
+        this.listLoading = false;
       },
       /**
        * 删除菜单
@@ -264,12 +300,13 @@
           permission: "",
           path: "",
           url: "",
-          method: "",
+          method: "Get",
           parentId: "",
+          parentName: "",
           icon: "",
           component: "",
-          sort: "",
-          type: ""
+          sort: 1,
+          type: "Menu"
         }
       },
       /**
@@ -298,6 +335,12 @@
         const record = this.formatMenuTreeData[trIndex]
         record._expanded = !record._expanded
       },
+      /**
+       * 显示父级菜单树
+       */
+      handleMenuTree: function () {
+        this.menuDialogTreeVisible = true;
+      }
     }
   };
 </script>

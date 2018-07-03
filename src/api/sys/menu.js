@@ -5,7 +5,7 @@ import request from '@/utils/request'
  */
 export function treeList( ) {
   return request({
-    url: '/upms/menu/list',
+    url: '/upms/menu/treeList',
     method: 'get'
   })
 }
