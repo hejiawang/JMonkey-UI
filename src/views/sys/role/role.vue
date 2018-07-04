@@ -1,5 +1,7 @@
 <template>
   <el-container>
+
+    <!-- 角色 curd start -->
     <div class="main-container" :style="mainStyle">
 
       <!-- 功能按钮 start -->
@@ -69,16 +71,28 @@
       <!-- 新增修改角色 end -->
 
     </div>
+    <!-- 角色 curd end -->
+
+    <!-- 角色授权 start -->
     <div class="main-container" :style="authorizeStyle">
-      <el-tree :data="menuTreeDate" node-key="id" highlight-current :props="menuTreeProps" show-checkbox>
-      </el-tree>
+      <el-card>
+        <div slot="header" class="clearfix">
+          <span>授权角色： <el-tag type="info" v-if="authorizeRole">{{ authorizeRole.name }}</el-tag> </span>
+          <el-button style="float: right; " type="primary" plain @click="roleAuthorize">确定授权</el-button>
+        </div>
+        <el-tree :data="menuTreeDate" :default-checked-keys="checkedMenu" node-key="id" highlight-current :props="menuTreeProps" show-checkbox v-loading="treeLoading" ref="menuTree">
+        </el-tree>
+      </el-card>
     </div>
+    <!-- 角色授权 end -->
+
   </el-container>
 </template>
 <script>
   import waves from "@/directive/waves/index.js"; //按钮水波纹效果
   import { list, find, save, modify, del, checkCode, checkName } from "@/api/sys/role";
   import { treeList } from "@/api/sys/menu";
+  import { findMenuByRole, modifyAuth } from  "@/api/sys/roleMenu";
 
   export default {
     name: "role",
@@ -115,6 +129,7 @@
 
       return {
         listLoading: false,  //页面是否在加载
+        treeLoading: false,
         roleDialogFormVisible: false, //是否显示角色 dialog
         roleTableData: null,   //角色列表数据
         roleDialogStatus: "", //role dialog 状态 新增或者修改角色
@@ -155,6 +170,7 @@
         },
         menuTreeDate: [],
         authorizeRole: null,
+        checkedMenu: [],
       }
     },
     created() {
@@ -175,8 +191,12 @@
         });
       },
       menuTreeList(){
+        this.treeLoading = true;
+
         treeList().then(data => {
           this.menuTreeDate = data.result;
+
+          this.treeLoading = false;
         });
       },
       /**
@@ -278,11 +298,32 @@
           remark: ""
         }
       },
+      /**
+       * 角色授权tab
+       * @param row
+       */
       authorizeTag( row ){
+        this.treeLoading = true;
         this.authorizeRole = row;
 
-        this.mainStyle = "animation:divShow 1s;-webkit-animation:divShow 1s;";
-        this.authorizeStyle = "animation:tagShow 1s;-webkit-animation:tagShow 1s; padding: 76px 50px 0px 50px; height: calc(100% - 76px);";
+        findMenuByRole(row.id).then((data) => {
+          this.checkedMenu = Array.isArray(data.result) ? data.result : [data.result];
+
+          this.mainStyle = "animation:divShow 1s;-webkit-animation:divShow 1s;";
+          this.authorizeStyle = "animation:tagShow 1s;-webkit-animation:tagShow 1s; padding: 20px 30px 0px 50px; ";
+
+          this.treeLoading = false;
+        });
+      },
+      /**
+       * 更新角色权限
+       */
+      roleAuthorize(){
+        this.treeLoading = true;
+
+        modifyAuth( this.authorizeRole.id, this.$refs.menuTree.getCheckedKeys() ).then(() => {
+          this.treeLoading = false;
+        });
       }
     }
   };
@@ -305,5 +346,18 @@
   @-webkit-keyframes tagShow {
     0%   { width:0%;}
     100% { width:40%;}
+  }
+
+  .el-card{
+    height: 100%;
+  }
+
+  .el-card__body{
+      height: calc(100% - 50px);
+  }
+
+  .el-tree{
+    height: calc(100% - 60px);
+    overflow-y: scroll;
   }
 </style>
