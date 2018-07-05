@@ -34,8 +34,19 @@ $aside-width: 200px;
     .main-container {
       height: calc(100% - 35px);
       width: 100%;
-      .main-btn-group {
+      .main-top-group {
         margin: 20px 0px;
+        .main-search {
+          width: 500px;
+          float: right;
+          margin-left: 20px;
+          .el-select .el-input {
+            width: 120px;
+          }
+          .el-input-group__prepend {
+            background-color: #fff !important;
+          }
+        }
       }
     }
   }

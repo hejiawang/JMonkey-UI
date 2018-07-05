@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import qs from 'qs';
 
 /**
  * 根据角色获取角色菜单权限
@@ -19,10 +20,10 @@ export function findMenuByRole( id ) {
 export function modifyAuth(roleId, menuIds) {
   return request({
     url: '/upms/roleMenu/modifyAuth',
-    method: 'put',
-    params: {
+    method: 'post',
+    data: qs.stringify({
       roleId: roleId,
       menuIds: menuIds
-    }
+    }, {arrayFormat: 'brackets'})
   })
 }

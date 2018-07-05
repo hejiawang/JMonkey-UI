@@ -3,7 +3,7 @@
     <div class="main-container">
 
       <!-- 功能按钮 start -->
-      <el-row class="main-btn-group">
+      <el-row class="main-top-group">
         <el-button v-waves type="primary" @click="handleCreateUser">新增用户</el-button>
       </el-row>
       <!-- 功能按钮 end -->

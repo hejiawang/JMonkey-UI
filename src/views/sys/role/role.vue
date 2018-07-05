@@ -5,8 +5,18 @@
     <div class="main-container" :style="mainStyle">
 
       <!-- 功能按钮 start -->
-      <el-row class="main-btn-group">
+      <el-row class="main-top-group">
         <el-button v-waves type="primary" @click="handleCreateRole">新增角色</el-button>
+
+        <el-input placeholder="请输入查询内容" v-model="search.value"  class="main-search">
+          <i slot="suffix" class="el-input__icon el-icon-close" @click="restSearch"></i>
+          <el-select v-model="search.key" slot="prepend" placeholder="请选择">
+            <el-option label="角色名称" value="name"></el-option>
+            <el-option label="角色编码" value="code"></el-option>
+          </el-select>
+          <el-button slot="append" icon="el-icon-search" v-waves @click="searchRole"></el-button>
+        </el-input>
+
       </el-row>
       <!-- 功能按钮 end -->
 
@@ -46,18 +56,18 @@
           <el-row>
             <el-col :span="12">
               <el-form-item label="角色名称" prop="name">
-                <el-input v-model="roleForm.name" placeholder="请输入角色名称" />
+                <el-input v-model="roleForm.name" placeholder="请输入角色名称" maxlength="20"/>
               </el-form-item>
             </el-col>
             <el-col :span="12">
               <el-form-item label="角色编码" prop="code">
-                <el-input v-model="roleForm.code" placeholder="请输入角色编码" />
+                <el-input v-model="roleForm.code" placeholder="请输入角色编码" maxlength="20"/>
               </el-form-item>
             </el-col>
           </el-row>
 
           <el-form-item label="角色描述" prop="remark">
-            <el-input v-model="roleForm.remark" type="textarea" :rows="2"/>
+            <el-input v-model="roleForm.remark" type="textarea" :rows="2" maxlength="100"/>
           </el-form-item>
 
         </el-form>
@@ -77,10 +87,10 @@
     <div class="main-container" :style="authorizeStyle">
       <el-card>
         <div slot="header" class="clearfix">
-          <span>授权角色： <el-tag type="info" v-if="authorizeRole">{{ authorizeRole.name }}</el-tag> </span>
+          <span>授权角色： <el-tag type="info" key="tag" closable @close="closeAuthorize()" v-if="authorizeRole">{{ authorizeRole.name }}</el-tag> </span>
           <el-button style="float: right; " type="primary" plain @click="roleAuthorize">确定授权</el-button>
         </div>
-        <el-tree :data="menuTreeDate" :default-checked-keys="checkedMenu" node-key="id" highlight-current :props="menuTreeProps" show-checkbox v-loading="treeLoading" ref="menuTree">
+        <el-tree :data="menuTreeDate" node-key="id" highlight-current :props="menuTreeProps" show-checkbox v-loading="treeLoading" ref="menuTree">
         </el-tree>
       </el-card>
     </div>
@@ -137,6 +147,10 @@
           createRole: "新增角色",
           modifyRole: "修改角色"
         },
+        search: {
+          key: "name",
+          value: ""
+        },
         listTotal: null,  //用户列表总条数
         listQuery: {  //用户列表分页条件
           current: 1,
@@ -170,7 +184,6 @@
         },
         menuTreeDate: [],
         authorizeRole: null,
-        checkedMenu: [],
       }
     },
     created() {
@@ -212,6 +225,20 @@
       handleCurrentChange( val ){
         this.listQuery.current = val;
         this.roleList();
+      },
+      /**
+       * 搜索角色信息
+       */
+      searchRole(){
+        this.listQuery[this.search.key] = this.search.value;
+        this.roleList();
+      },
+      /**
+       * 重置检索内容
+       */
+      restSearch(){
+        this.search.value = "";
+        this.searchRole();
       },
       /**
        * 删除角色
@@ -303,15 +330,15 @@
        * @param row
        */
       authorizeTag( row ){
+        this.mainStyle = "animation:divShow 1s;-webkit-animation:divShow 1s;";
+        this.authorizeStyle = "animation:tagShow 1s;-webkit-animation:tagShow 1s; padding: 20px 30px 0px 50px; ";
+
         this.treeLoading = true;
         this.authorizeRole = row;
+        this.$refs.menuTree.setCheckedKeys([]);
 
         findMenuByRole(row.id).then((data) => {
-          this.checkedMenu = Array.isArray(data.result) ? data.result : [data.result];
-
-          this.mainStyle = "animation:divShow 1s;-webkit-animation:divShow 1s;";
-          this.authorizeStyle = "animation:tagShow 1s;-webkit-animation:tagShow 1s; padding: 20px 30px 0px 50px; ";
-
+          this.$refs.menuTree.setCheckedKeys(Array.isArray(data.result) ? data.result : [data.result]);
           this.treeLoading = false;
         });
       },
@@ -323,7 +350,15 @@
 
         modifyAuth( this.authorizeRole.id, this.$refs.menuTree.getCheckedKeys() ).then(() => {
           this.treeLoading = false;
+          this.$notify({ title: "成功", message: "授权成功", type: "success", duration: 2000 });
         });
+      },
+      /**
+       * 关闭授权tab
+       */
+      closeAuthorize(){
+        this.mainStyle = "animation:divHidden 1s;-webkit-animation:divHidden 1s; width: 100%";
+        this.authorizeStyle = "animation:tagHidden 1s;-webkit-animation:tagHidden 1s; display: none;";
       }
     }
   };
@@ -348,6 +383,24 @@
     100% { width:40%;}
   }
 
+  @keyframes divHidden {
+    0%   { width:60%;}
+    100% { width:100%;}
+  }
+  @-webkit-keyframes divHidden {
+    0%   { width:60%;}
+    100% { width:100%;}
+  }
+
+  @keyframes tagHidden {
+    0%   { width:40%;}
+    100% { width:0%;}
+  }
+  @-webkit-keyframes tagHidden {
+    0%   { width:40%;}
+    100% { width:0%;}
+  }
+
   .el-card{
     height: 100%;
   }
@@ -361,3 +414,4 @@
     overflow-y: scroll;
   }
 </style>
+
