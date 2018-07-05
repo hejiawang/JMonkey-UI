@@ -25,7 +25,14 @@
 
         <el-table-column prop="type" label="类型" show-overflow-tooltip/>
         <el-table-column prop="icon" label="图标" show-overflow-tooltip/>
-        <el-table-column prop="sort" label="排序" show-overflow-tooltip/>
+        <el-table-column prop="sort" label="排序" show-overflow-tooltip width="100">
+          <template slot-scope="scope">
+
+            <el-input v-if="modifySortVisible" v-model="modifySortValue" ref="modifySortTag" size="small"
+              @keyup.enter.native="handleModifySort" @blur="handleModifySort" ></el-input>
+            <el-button v-else size="small" style="width: 70px">{{scope.row.sort}}</el-button>
+          </template>
+        </el-table-column>
         <el-table-column prop="permission" label="权限" show-overflow-tooltip/>
         <el-table-column prop="method" label="请求方法" show-overflow-tooltip/>
         <el-table-column prop="url" label="请求链接" show-overflow-tooltip/>
@@ -155,6 +162,8 @@
         listLoading: false,  //页面是否在加载
         menuDialogTreeVisible: false,  //父级菜单树dislog
         menuDialogFormVisible: false, //是否显示菜单 dialog
+        modifySortVisible: false,
+        modifySortValue: 1,
         menuDialogStatus: "", //menu dialog 状态 新增或者修改菜单
         textMap: {  //显示文字
           createMenu: "新增菜单",
@@ -339,6 +348,9 @@
 
         this.menuForm.parentId = data.id;
         this.menuForm.parentName = data.name;
+      },
+      handleModifySort(){
+
       }
     }
   };
