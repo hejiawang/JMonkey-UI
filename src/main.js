@@ -7,6 +7,7 @@ import VueMoment from 'vue-moment'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import '@/styles/index.scss'
+import '@/assets/css/iconfont/iconfont.css'
 import store from './store'
 import 'babel-polyfill'
 import * as filters from './filters' //全局filter

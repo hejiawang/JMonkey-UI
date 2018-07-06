@@ -15,15 +15,20 @@
         <el-table-column prop="phone" label="手机号码" show-overflow-tooltip/>
         <el-table-column prop="sex" label="用户性别" show-overflow-tooltip>
           <template slot-scope="scope">
-            <!--<i class="fa fa-male" v-if=" scope.row.sex == 'Man' "></i>-->
+            <i class="icon iconfont icon-man" v-if=" scope.row.sex == 'Man' "></i>
+            <i class="icon iconfont icon-woman" v-if=" scope.row.sex == 'Woman' "></i>
+            <i class="icon iconfont icon-man1" v-if=" scope.row.sex == 'Other' "></i>
+
             <span>{{ scope.row.sex | sexFilter }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column fixed="right" label="操作" width="300" align="center">
+        <el-table-column fixed="right" label="操作" width="350" align="center">
           <template slot-scope="scope">
             <el-button size="mini" type="success" v-waves @click="handleModifyUser(scope.row)">编辑</el-button>
             <el-button size="mini" type="danger" v-waves @click="deleteUser(scope.row)">删除</el-button>
+            <el-button size="mini" type="warning" v-waves @click="handleRole(scope.row)">角色</el-button>
+            <el-button size="mini" v-waves >密码重置</el-button>
           </template>
         </el-table-column>
 
@@ -75,6 +80,28 @@
       </el-dialog>
       <!-- 新增修改用户 end -->
 
+      <!-- 分配角色 start -->
+      <el-dialog title="分配角色" :visible="roleDialogVisible" class="main-dialog-table" @open="roleDialogOpen">
+
+        <el-table :data="roleTableData" ref="roleTable" height="300px" tooltip-effect="dark" v-loading="roleListLoading">
+          <el-table-column type="selection" width="50"/>
+          <el-table-column prop="name" label="角色名称" show-overflow-tooltip width="200"/>
+          <el-table-column prop="code" label="角色编码" show-overflow-tooltip width="200"/>
+          <el-table-column prop="remark" label="角色描述" show-overflow-tooltip/>
+          <el-table-column prop="createDate" label="创建时间" show-overflow-tooltip>
+            <template slot-scope="scope">
+              <i class="el-icon-time"></i>
+              <span>{{scope.row.createDate | parseTime }}</span>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-pagination @size-change="handleRoleSizeChange" @current-change="handleRoleCurrentChange" :current-page.sync="roleListQuery.current" :page-sizes="[10,20,30,50]" :page-size="roleListQuery.size" layout="total, sizes, prev, pager, next, jumper" :total="roleListTotal" />
+        <div slot="footer" class="dialog-footer">
+          <el-button v-waves @click="cancelRoleDialog()">取 消</el-button>
+          <el-button v-waves type="primary" @click="createUser('userForm')">确 定</el-button>
+        </div>
+      </el-dialog>
+      <!-- 分配角色 end -->
     </div>
   </el-container>
 </template>
@@ -82,6 +109,7 @@
   import waves from "@/directive/waves/index.js"; //按钮水波纹效果
   import { list, find, save, modify, del, checkUserName } from "@/api/sys/user";
   import { listAll } from  "@/api/sys/role";
+  import { list as roleList } from "@/api/sys/role";
   import { validatePhone } from  "@/utils/validate";
 
   export default {
@@ -125,6 +153,15 @@
         userTableData: null,   //用户列表数据
         userDialogStatus: "", //user dialog 状态 新增用户或者修改用户
         roleSelectListData: null, //角色信息
+        roleDialogVisible: false, //分配角色dialog是否显示
+        roleUserData: null, //分配角色的用户
+        roleTableData: null, //角色列表数据
+        roleListLoading: false, //角色列表加载
+        roleListTotal: null,  //角色列表总条数
+        roleListQuery: {  //角色列表分页条件
+          current: 1,
+          size: 10
+        },
         textMap: {  //显示文字
           createUser: "新增用户",
           modifyUser: "修改用户"
@@ -170,6 +207,7 @@
     created() {
       this.userList();
       this.initRoleInfo();
+      this.initRoleList();
     },
     methods: {
       /**
@@ -186,6 +224,17 @@
       },
       initRoleInfo(){
         listAll().then( data => this.roleSelectListData = Array.isArray(data.result) ? data.result : [data.result] );
+      },
+      /**
+       * 初始化角色表格数据
+       */
+      initRoleList(){
+        this.roleListLoading = true;
+        roleList(this.roleListQuery).then( data => {
+          this.roleListTotal = data.total;
+          this.roleTableData = data.rows;
+          this.roleListLoading = false;
+        });
       },
       /**
        * 分页插件——每页数量变化
@@ -287,7 +336,46 @@
           roleIdList: [],
           sex: "Man"
         }
-      }
+      },
+      handleRole( row ){
+        this.roleUserData = row;
+
+        find( row.id ).then( data => {
+          this.roleDialogVisible = true;
+          //this.$refs.roleTable.toggleRowSelection(this.roleTableData[1]);
+          /*let userRoles = Array.isArray(data.result.roleList) ? data.result.roleList : [data.result.roleList];
+          if( userRoles ){
+            userRoles.forEach(userRole => {
+
+              this.$refs.roleTable.toggleRowSelection(this.roleTableData[1]);
+            });
+          }*/
+        });
+      },
+      roleDialogOpen(){
+        this.$nextTick(function () {
+          this.$refs.roleTable.clearSelection();
+          this.$refs.roleTable.toggleRowSelection( this.roleTableData[1], true );
+        });
+      },
+      cancelRoleDialog(){
+        this.roleUserData = null;
+        this.roleDialogVisible = false;
+      },
+      /**
+       * 角色表格分页插件——每页数量变化
+       */
+      handleRoleSizeChange( val ){
+        this.roleListQuery.size = val;
+        this.initRoleList()
+      },
+      /**
+       * 角色表格分页插件——当前页变化
+       */
+      handleRoleCurrentChange( val ){
+        this.roleListQuery.current = val;
+        this.initRoleList()
+      },
     }
   };
 </script>

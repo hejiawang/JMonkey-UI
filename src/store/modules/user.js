@@ -18,9 +18,7 @@ const user = {
      */
     LoginByUsername({ commit, state, dispatch }, userInfo) {
       return new Promise((resolve, reject) => {
-        loginByUsername(userInfo.username, userInfo.password, userInfo.code, userInfo.randomStr).then(response => {
-          const data = response.data;
-
+        loginByUsername(userInfo.username, userInfo.password, userInfo.code, userInfo.randomStr).then(data => {
           setToken(data.access_token);
           commit('SET_ACCESS_TOKEN', data.access_token);
           commit('SET_REFRESH_TOKEN', data.refresh_token);

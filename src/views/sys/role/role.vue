@@ -151,8 +151,8 @@
           key: "name",
           value: ""
         },
-        listTotal: null,  //用户列表总条数
-        listQuery: {  //用户列表分页条件
+        listTotal: null,  //角色列表总条数
+        listQuery: {  //角色列表分页条件
           current: 1,
           size: 10
         },

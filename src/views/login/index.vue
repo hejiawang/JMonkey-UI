@@ -25,7 +25,6 @@
 </template>
 <script>
   import { mapGetters } from "vuex";
-  import '../../assets/css/iconfont/iconfont.css'
   import userLogin from "./userlogin";
   import topTheme from "../../components/layout/top-theme";
 

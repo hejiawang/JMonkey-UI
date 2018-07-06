@@ -1,7 +1,7 @@
 <template>
   <el-container>
     <div class="main-container">
-      <el-row class="main-btn-group">
+      <el-row class="main-top-group">
         <el-button v-waves @click="dialogFormVisible = true">默认按钮</el-button>
         <el-button v-waves type="primary" @click="getTestTableSelect">主要按钮</el-button>
         <el-button v-waves type="success">成功按钮</el-button>
