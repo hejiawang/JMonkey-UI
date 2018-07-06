@@ -19,7 +19,7 @@ export function list( query ) {
  */
 export function find(id) {
   return request({
-    url: '/upms/user/find/' + id,
+    url: '/upms/user/findDto/' + id,
     method: 'get'
   })
 }

@@ -11,10 +11,11 @@
       <!-- 列表 start -->
       <el-table :data="userTableData" ref="userTable" height="calc(100% - 80px)" tooltip-effect="dark" v-loading="listLoading">
 
-        <el-table-column prop="username" label="姓名" show-overflow-tooltip/>
-        <el-table-column prop="phone" label="电话" show-overflow-tooltip/>
-        <el-table-column prop="sex" label="性别" show-overflow-tooltip>
+        <el-table-column prop="username" label="用户名称" show-overflow-tooltip/>
+        <el-table-column prop="phone" label="手机号码" show-overflow-tooltip/>
+        <el-table-column prop="sex" label="用户性别" show-overflow-tooltip>
           <template slot-scope="scope">
+            <!--<i class="fa fa-male" v-if=" scope.row.sex == 'Man' "></i>-->
             <span>{{ scope.row.sex | sexFilter }}</span>
           </template>
         </el-table-column>
@@ -42,8 +43,14 @@
             <el-input v-model="userForm.username" placeholder="请输入用户名称" />
           </el-form-item>
 
-          <el-form-item label="登录密码" prop="password">
+          <el-form-item v-if=" userDialogStatus == 'createUser' " label="登录密码" prop="password">
             <el-input v-model="userForm.password" placeholder="请输入登录密码" type="password" />
+          </el-form-item>
+
+          <el-form-item label="用户角色" prop="roleIdList">
+            <el-select v-model="userForm.roleIdList" multiple placeholder="请选择用户角色">
+              <el-option v-for="item in roleSelectListData" :key="item.id" :label="item.name" :value="item.id" />
+            </el-select>
           </el-form-item>
 
           <el-form-item label="手机号码" prop="phone">
@@ -74,6 +81,7 @@
 <script>
   import waves from "@/directive/waves/index.js"; //按钮水波纹效果
   import { list, find, save, modify, del, checkUserName } from "@/api/sys/user";
+  import { listAll } from  "@/api/sys/role";
   import { validatePhone } from  "@/utils/validate";
 
   export default {
@@ -116,6 +124,7 @@
         userDialogFormVisible: false, //是否显示user dialog
         userTableData: null,   //用户列表数据
         userDialogStatus: "", //user dialog 状态 新增用户或者修改用户
+        roleSelectListData: null, //角色信息
         textMap: {  //显示文字
           createUser: "新增用户",
           modifyUser: "修改用户"
@@ -129,6 +138,7 @@
           username: "",
           password: "",
           phone: "",
+          roleIdList: [],
           sex: "Man"
         },
         userRules: {  //user form rule
@@ -159,6 +169,7 @@
     },
     created() {
       this.userList();
+      this.initRoleInfo();
     },
     methods: {
       /**
@@ -172,6 +183,9 @@
 
           this.listLoading = false;
         });
+      },
+      initRoleInfo(){
+        listAll().then( data => this.roleSelectListData = Array.isArray(data.result) ? data.result : [data.result] );
       },
       /**
        * 分页插件——每页数量变化
@@ -270,6 +284,7 @@
           username: "",
           password: "",
           phone: "",
+          roleIdList: [],
           sex: "Man"
         }
       }

@@ -12,6 +12,13 @@ export function list( query ) {
   })
 }
 
+export function listAll() {
+  return request({
+    url: '/upms/role/listAll',
+    method: 'get'
+  })
+}
+
 /**
  * 获取角色信息
  * @param id 角色ID
