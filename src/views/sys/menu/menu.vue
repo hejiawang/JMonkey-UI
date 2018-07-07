@@ -22,15 +22,16 @@
             <span>{{scope.row.name}}</span>
           </template>
         </el-table-column>
-
-        <el-table-column prop="type" label="类型" show-overflow-tooltip/>
+        <el-table-column prop="type" label="类型" show-overflow-tooltip>
+          <template slot-scope="scope">
+            <span>{{ scope.row.type | menuTypeFilter }}</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="icon" label="图标" show-overflow-tooltip/>
         <el-table-column prop="sort" label="排序" show-overflow-tooltip width="100">
           <template slot-scope="scope">
-
-            <el-input v-if="modifySortVisible" v-model="modifySortValue" ref="modifySortTag" size="small"
-              @keyup.enter.native="handleModifySort" @blur="handleModifySort" ></el-input>
-            <el-button v-else size="small" style="width: 70px">{{scope.row.sort}}</el-button>
+            <el-input v-if="scope.row.sortEdit" :ref="scope.row.id" v-model.number="scope.row.sort" size="small" style="width: 70px" @keyup.enter.native="handleModifySort(scope.row)" @blur="handleModifySort(scope.row)" />
+            <el-button v-else size="small" v-waves style="width: 70px" @click="modifySort(scope.row)">{{scope.row.sort}}</el-button>
           </template>
         </el-table-column>
         <el-table-column prop="permission" label="权限" show-overflow-tooltip/>
@@ -43,6 +44,7 @@
           <template slot-scope="scope">
             <el-button size="mini" type="success" v-waves @click="handleModifyMenu(scope.row)">编辑</el-button>
             <el-button size="mini" type="danger" v-waves @click="deleteMenu(scope.row)">删除</el-button>
+            <el-button size="mini" type="warning" v-waves @click="handleCreateNextMenu(scope.row)">新增下级菜单</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -150,6 +152,7 @@
   import waves from "@/directive/waves/index.js"; //按钮水波纹效果
   import { treeList, find, save, modify, del } from "@/api/sys/menu";
   import { treeToArray } from "@/utils/util";
+  import { validateNumber } from  "@/utils/validate";
   import '@/styles/treeTable.scss';
 
   export default {
@@ -162,9 +165,8 @@
         listLoading: false,  //页面是否在加载
         menuDialogTreeVisible: false,  //父级菜单树dislog
         menuDialogFormVisible: false, //是否显示菜单 dialog
-        modifySortVisible: false,
-        modifySortValue: 1,
         menuDialogStatus: "", //menu dialog 状态 新增或者修改菜单
+        menuSortTemp : 1, //临时记录菜单排序
         textMap: {  //显示文字
           createMenu: "新增菜单",
           modifyMenu: "修改菜单"
@@ -201,7 +203,20 @@
        */
       formatMenuTreeData: function() {
         let tmpTreeData = Array.isArray(this.treeDate) ? this.treeDate : [this.treeDate];
-        return treeToArray(tmpTreeData, false);
+        let treeArray = treeToArray(tmpTreeData, false);
+        return treeArray.map(v => {
+          this.$set(v, 'sortEdit', false);
+          return v
+        });
+      }
+    },
+    filters:{
+      menuTypeFilter( val ){
+        const valMap = {
+          Menu: "菜单",
+          Button: "按钮"
+        };
+        return valMap[val];
       }
     },
     created() {
@@ -285,6 +300,15 @@
         })
       },
       /**
+       * 新增下级菜单dialog
+       * @param row
+       */
+      handleCreateNextMenu(row){
+        this.handleCreateMenu();
+        this.menuForm.parentId = row.id;
+        this.menuForm.parentName = row.name;
+      },
+      /**
        * 关闭menu dialog
        * @param formName
        */
@@ -343,15 +367,44 @@
       handleMenuTree() {
         this.menuDialogTreeVisible = true;
       },
+      /**
+       * 设置父菜单数据
+       * @param data
+       */
       getParentMenu(data){
         this.menuDialogTreeVisible = false;
 
         this.menuForm.parentId = data.id;
         this.menuForm.parentName = data.name;
       },
-      handleModifySort(){
+      /**
+       * 显示修改菜单排序input
+       * @param row
+       */
+      modifySort( row ){
+        this.formatMenuTreeData.forEach(function (menu) { menu.sortEdit = false; })
+        this.menuSortTemp = row.sort;
+        row.sortEdit = true;
 
+        this.$nextTick(_ => { this.$refs[row.id].$refs.input.focus(); });
+      },
+      /**
+       * 修改菜单排序
+       * @param row
+       */
+      handleModifySort(row){
+        if( !validateNumber(row.sort) || row.sort == this.menuSortTemp || row.sort > 10000 ) row.sort = this.menuSortTemp;
+        else modify({id: row.id, sort: row.sort}).then(() => { this.menuTreeList(); });
+
+        row.sortEdit = false;
       }
     }
   };
 </script>
+
+<style lang="scss">
+  .el-tree{
+    height: 400px;
+    overflow-y: scroll;
+  }
+</style>
