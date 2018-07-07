@@ -12,6 +12,11 @@
       <el-table :data="userTableData" ref="userTable" height="calc(100% - 80px)" tooltip-effect="dark" v-loading="listLoading">
 
         <el-table-column prop="username" label="用户名称" show-overflow-tooltip/>
+        <el-table-column prop="roleList" label="用户角色" show-overflow-tooltip>
+          <template slot-scope="scope">
+            <span><template v-for="roleInfo in scope.row.roleList"> {{roleInfo.name}}, </template></span>
+          </template>
+        </el-table-column>
         <el-table-column prop="phone" label="手机号码" show-overflow-tooltip/>
         <el-table-column prop="sex" label="用户性别" show-overflow-tooltip>
           <template slot-scope="scope">
@@ -394,6 +399,7 @@
         saveRoles(this.roleUserData.id, this.roleSelectIds).then(() => {
           this.roleListLoading = false;
           this.roleDialogVisible = false;
+          this.userList();
           this.$notify({ title: "成功", message: "分配角色成功", type: "success", duration: 2000 });
         });
       },
