@@ -28,7 +28,7 @@
             <el-button size="mini" type="success" v-waves @click="handleModifyUser(scope.row)">编辑</el-button>
             <el-button size="mini" type="danger" v-waves @click="deleteUser(scope.row)">删除</el-button>
             <el-button size="mini" type="warning" v-waves @click="handleRole(scope.row)">角色</el-button>
-            <el-button size="mini" v-waves >密码重置</el-button>
+            <el-button size="mini" v-waves @click="restPassword(scope.row)">密码重置</el-button>
           </template>
         </el-table-column>
 
@@ -83,7 +83,7 @@
       <!-- 分配角色 start -->
       <el-dialog title="分配角色" :visible="roleDialogVisible" class="main-dialog-table" @open="roleDialogOpen">
 
-        <el-table :data="roleTableData" ref="roleTable" height="300px" tooltip-effect="dark" v-loading="roleListLoading">
+        <el-table :data="roleTableData" ref="roleTable" height="300px" tooltip-effect="dark" v-loading="roleListLoading" @selection-change="handleRoleSelect">
           <el-table-column type="selection" width="50"/>
           <el-table-column prop="name" label="角色名称" show-overflow-tooltip width="200"/>
           <el-table-column prop="code" label="角色编码" show-overflow-tooltip width="200"/>
@@ -98,7 +98,7 @@
         <el-pagination @size-change="handleRoleSizeChange" @current-change="handleRoleCurrentChange" :current-page.sync="roleListQuery.current" :page-sizes="[10,20,30,50]" :page-size="roleListQuery.size" layout="total, sizes, prev, pager, next, jumper" :total="roleListTotal" />
         <div slot="footer" class="dialog-footer">
           <el-button v-waves @click="cancelRoleDialog()">取 消</el-button>
-          <el-button v-waves type="primary" @click="createUser('userForm')">确 定</el-button>
+          <el-button v-waves type="primary" @click="saveRoles()">确 定</el-button>
         </div>
       </el-dialog>
       <!-- 分配角色 end -->
@@ -107,9 +107,9 @@
 </template>
 <script>
   import waves from "@/directive/waves/index.js"; //按钮水波纹效果
-  import { list, find, save, modify, del, checkUserName } from "@/api/sys/user";
-  import { listAll } from  "@/api/sys/role";
-  import { list as roleList } from "@/api/sys/role";
+  import { list, find, save, modify, del, checkUserName, restPasswsord } from "@/api/sys/user";
+  import { listAll, list as roleList } from  "@/api/sys/role";
+  import { saveRoles } from  "@/api/sys/userRole";
   import { validatePhone } from  "@/utils/validate";
 
   export default {
@@ -152,6 +152,7 @@
         userDialogFormVisible: false, //是否显示user dialog
         userTableData: null,   //用户列表数据
         userDialogStatus: "", //user dialog 状态 新增用户或者修改用户
+        roleSelectIds: [],  //  分配角色时选中的角色Id list
         roleSelectListData: null, //角色信息
         roleDialogVisible: false, //分配角色dialog是否显示
         roleUserData: null, //分配角色的用户
@@ -265,6 +266,19 @@
         });
       },
       /**
+       * 密码重置
+       * @param row
+       */
+      restPassword( row ){
+        this.$confirm( "该用户(" + row.username + ")的密码将重置为'123456', 是否继续?", "提示",
+          { confirmButtonText: "确定", cancelButtonText: "取消", type: "warning" }
+        ).then(() => {
+          restPasswsord(row.id).then(( result ) => {
+            this.$notify({ title: "成功", message: "密码重置成功", type: "success", duration: 2000 });
+          });
+        });
+      },
+      /**
        * 修改用户 dialog
        * @param row
        */
@@ -337,27 +351,55 @@
           sex: "Man"
         }
       },
+      /**
+       * 分配角色dialog
+       */
       handleRole( row ){
         this.roleUserData = row;
-
-        find( row.id ).then( data => {
-          this.roleDialogVisible = true;
-          //this.$refs.roleTable.toggleRowSelection(this.roleTableData[1]);
-          /*let userRoles = Array.isArray(data.result.roleList) ? data.result.roleList : [data.result.roleList];
-          if( userRoles ){
-            userRoles.forEach(userRole => {
-
-              this.$refs.roleTable.toggleRowSelection(this.roleTableData[1]);
-            });
-          }*/
-        });
+        this.roleDialogVisible = true;
+        this.roleListLoading = true;
       },
+      /**
+       * 分配角色dialog open回调
+       * this.$refs.roleTable.toggleRowSelection(this.roleTableData[1]);
+       */
       roleDialogOpen(){
         this.$nextTick(function () {
           this.$refs.roleTable.clearSelection();
-          this.$refs.roleTable.toggleRowSelection( this.roleTableData[1], true );
+
+          find( this.roleUserData.id ).then( data => {
+            if( data.result.roleIdList ){
+              let userRoles = Array.isArray(data.result.roleIdList) ? data.result.roleIdList : [data.result.roleIdList];
+              userRoles.forEach(userRole => {
+                this.$refs.roleTable.toggleRowSelection( this.roleTableData.find( d => d.id === userRole ) );
+              });
+            }
+
+            this.roleListLoading = false;
+          });
         });
       },
+      /**
+       * 选择分配的角色回调
+       */
+      handleRoleSelect( roles ){
+        this.roleSelectIds = [];
+        roles.forEach( role => this.roleSelectIds.push(role.id) );
+      },
+      /**
+       * 设置用户角色
+       */
+      saveRoles(){
+        this.roleListLoading = true;
+        saveRoles(this.roleUserData.id, this.roleSelectIds).then(() => {
+          this.roleListLoading = false;
+          this.roleDialogVisible = false;
+          this.$notify({ title: "成功", message: "分配角色成功", type: "success", duration: 2000 });
+        });
+      },
+      /**
+       * 关闭分配角色dialog
+       */
       cancelRoleDialog(){
         this.roleUserData = null;
         this.roleDialogVisible = false;

@@ -59,6 +59,13 @@ export function del(id) {
   })
 }
 
+export function restPasswsord( id ) {
+  return request({
+    url: '/upms/user/restPasswsord/' + id,
+    method: 'get'
+  })
+}
+
 /**
  * 校验用户名是否存在
  * @param id 用户ID
