@@ -12,6 +12,7 @@
       <el-table :data="userTableData" ref="userTable" height="calc(100% - 80px)" tooltip-effect="dark" v-loading="listLoading">
 
         <el-table-column prop="username" label="用户名称" show-overflow-tooltip/>
+        <el-table-column prop="realName" label="真实名称" show-overflow-tooltip/>
         <el-table-column prop="roleList" label="用户角色" show-overflow-tooltip>
           <template slot-scope="scope">
             <span><template v-for="roleInfo in scope.row.roleList"> {{roleInfo.name}}, </template></span>
@@ -27,7 +28,12 @@
             <span>{{ scope.row.sex | sexFilter }}</span>
           </template>
         </el-table-column>
-
+        <el-table-column prop="birthday" label="出生日期" show-overflow-tooltip>
+          <template slot-scope="scope" v-if="scope.row.birthday">
+            <i class="el-icon-time"></i>
+            <span>{{scope.row.birthday | parseTime('{y}-{m}-{d}') }}</span>
+          </template>
+        </el-table-column>
         <el-table-column fixed="right" label="操作" width="350" align="center">
           <template slot-scope="scope">
             <el-button size="mini" type="success" v-waves @click="handleModifyUser(scope.row)">编辑</el-button>
@@ -46,34 +52,56 @@
 
       <!-- 新增修改用户 start -->
       <el-dialog :title="textMap[userDialogStatus]" :visible.sync="userDialogFormVisible">
-
         <el-form :model="userForm" :rules="userRules" ref="userForm" label-width="100px">
-
-          <el-form-item label="用户名称" prop="username">
-            <el-input v-model="userForm.username" placeholder="请输入用户名称" />
-          </el-form-item>
-
-          <el-form-item v-if=" userDialogStatus == 'createUser' " label="登录密码" prop="password">
-            <el-input v-model="userForm.password" placeholder="请输入登录密码" type="password" />
-          </el-form-item>
-
+          <el-row>
+            <el-col :span="12">
+              <el-form-item label="用户名称" prop="username">
+                <el-input v-model="userForm.username" placeholder="请输入用户名称" maxlength="20"/>
+              </el-form-item>
+            </el-col>
+            <el-col :span="11">
+              <el-form-item v-if=" userDialogStatus == 'createUser' " label="登录密码" prop="password">
+                <el-input v-model="userForm.password" placeholder="请输入登录密码" type="password" maxlength="20"/>
+              </el-form-item>
+            </el-col>
+            <el-col :span="1" style="text-align: center;">
+              <el-tooltip class="item" effect="light" content="默认密码：123456" placement="bottom-start" v-if=" userDialogStatus == 'createUser' ">
+                <i class="el-icon-question message-info"></i>
+              </el-tooltip>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="12">
+              <el-form-item label="真实姓名" prop="realName">
+                <el-input v-model="userForm.realName" placeholder="请输入真实姓名" maxlength="20"/>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="手机号码" prop="phone">
+                <el-input v-model="userForm.phone" placeholder="请输入手机号码" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="12">
+              <el-form-item label="用户性别" prop="sex">
+                <el-radio-group v-model="userForm.sex">
+                  <el-radio border label="Man">男</el-radio>
+                  <el-radio border label="Woman">女</el-radio>
+                  <el-radio border label="Other">其他</el-radio>
+                </el-radio-group>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="出生日期" prop="birthday">
+                <el-date-picker v-model="userForm.birthday" type="date" placeholder="选择日期" style="width: 100%"/>
+              </el-form-item>
+            </el-col>
+          </el-row>
           <el-form-item label="用户角色" prop="roleIdList">
             <el-select v-model="userForm.roleIdList" multiple placeholder="请选择用户角色">
               <el-option v-for="item in roleSelectListData" :key="item.id" :label="item.name" :value="item.id" />
             </el-select>
-          </el-form-item>
-
-          <el-form-item label="手机号码" prop="phone">
-            <el-input v-model="userForm.phone" placeholder="请输入手机号码" />
-          </el-form-item>
-
-          <el-form-item label="用户性别" prop="sex">
-            <el-radio-group v-model="userForm.sex">
-              <el-radio border label="Man">男</el-radio>
-              <el-radio border label="Woman">女</el-radio>
-              <el-radio border label="Other">其他</el-radio>
-            </el-radio-group>
-
           </el-form-item>
         </el-form>
 
@@ -179,10 +207,12 @@
         },
         userForm: { //user form
           username: "",
-          password: "",
+          password: "123456",
+          realName: "",
           phone: "",
           roleIdList: [],
-          sex: "Man"
+          sex: "Man",
+          birthday: ""
         },
         userRules: {  //user form rule
           username: [
@@ -350,10 +380,12 @@
       restUserForm(){
         this.userForm = { //user form
           username: "",
-          password: "",
+          password: "123456",
+          realName: "",
           phone: "",
           roleIdList: [],
-          sex: "Man"
+          sex: "Man",
+          birthday: ""
         }
       },
       /**

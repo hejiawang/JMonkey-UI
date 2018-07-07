@@ -38,6 +38,7 @@
             <el-button size="mini" type="success" v-waves @click="handleModifyRole(scope.row)">编辑</el-button>
             <el-button size="mini" type="danger" v-waves @click="deleteRole(scope.row)">删除</el-button>
             <el-button size="mini" type="warning" v-waves @click="authorizeTag(scope.row)">授权</el-button>
+            <el-button size="mini" v-waves type="info">用户</el-button>
           </template>
         </el-table-column>
 
