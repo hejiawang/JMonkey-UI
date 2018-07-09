@@ -7,7 +7,7 @@ import qs from 'qs';
  */
 export function findMenuByRole( id ) {
   return request({
-    url: '/upms/roleMenu/findMenuByRole/' + id,
+    url: '/upms/roleMenu/findMenuIdByRole/' + id,
     method: 'get'
   })
 }
