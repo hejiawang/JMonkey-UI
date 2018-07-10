@@ -17,11 +17,12 @@ export function findMenuByRole( id ) {
  * @param roleId 角色ID
  * @param menuIds 菜单ID数组
  */
-export function modifyAuth(roleId, menuIds) {
+export function modifyAuth(roleCode, roleId, menuIds) {
   return request({
     url: '/upms/roleMenu/modifyAuth',
     method: 'post',
     data: qs.stringify({
+      roleCode: roleCode,
       roleId: roleId,
       menuIds: menuIds
     }, {arrayFormat: 'brackets'})

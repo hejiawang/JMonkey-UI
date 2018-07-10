@@ -349,7 +349,7 @@
       roleAuthorize(){
         this.treeLoading = true;
 
-        modifyAuth( this.authorizeRole.id, this.$refs.menuTree.getCheckedKeys() ).then(() => {
+        modifyAuth( this.authorizeRole.code, this.authorizeRole.id, this.$refs.menuTree.getCheckedKeys() ).then(() => {
           this.treeLoading = false;
           this.$notify({ title: "成功", message: "授权成功", type: "success", duration: 2000 });
         });
