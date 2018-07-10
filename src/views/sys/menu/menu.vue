@@ -10,7 +10,7 @@
 
       <!-- 树形列表 start -->
       <el-table :data="formatMenuTreeData" ref="menuTable" height="calc(100% - 80px)" tooltip-effect="dark" :row-style="showRow" v-loading="listLoading">
-        <el-table-column prop="name" label="名称" show-overflow-tooltip width="300">
+        <el-table-column prop="name" label="名称" show-overflow-tooltip width="200">
           <template slot-scope="scope">
             <span v-for="space in scope.row._level" class="ms-tree-space" :key="space"></span>
 
@@ -22,12 +22,12 @@
             <span>{{scope.row.name}}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="type" label="类型" show-overflow-tooltip>
+        <el-table-column prop="type" label="类型" show-overflow-tooltip width="100">
           <template slot-scope="scope">
             <span>{{ scope.row.type | menuTypeFilter }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="icon" label="图标" show-overflow-tooltip/>
+        <el-table-column prop="icon" label="图标" show-overflow-tooltip width="100"/>
         <el-table-column prop="sort" label="排序" show-overflow-tooltip width="100">
           <template slot-scope="scope">
             <el-input v-if="scope.row.sortEdit" :ref="scope.row.id" v-model.number="scope.row.sort" size="small" style="width: 70px" @keyup.enter.native="handleModifySort(scope.row)" @blur="handleModifySort(scope.row)" />
@@ -35,7 +35,7 @@
           </template>
         </el-table-column>
         <el-table-column prop="permission" label="权限" show-overflow-tooltip/>
-        <el-table-column prop="method" label="请求方法" show-overflow-tooltip/>
+        <el-table-column prop="method" label="请求方法" show-overflow-tooltip width="100"/>
         <el-table-column prop="url" label="请求链接" show-overflow-tooltip/>
         <el-table-column prop="path" label="前端URL" show-overflow-tooltip/>
         <el-table-column prop="component" label="VUE页面" show-overflow-tooltip/>

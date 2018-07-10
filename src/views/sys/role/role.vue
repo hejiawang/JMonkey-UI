@@ -91,7 +91,7 @@
           <span>授权角色： <el-tag type="info" key="tag" closable @close="closeAuthorize()" v-if="authorizeRole">{{ authorizeRole.name }}</el-tag> </span>
           <el-button style="float: right; " type="primary" plain @click="roleAuthorize">确定授权</el-button>
         </div>
-        <el-tree :data="menuTreeDate" node-key="id" highlight-current :props="menuTreeProps" show-checkbox v-loading="treeLoading" ref="menuTree">
+        <el-tree :data="menuTreeDate" node-key="id" highlight-current :props="menuTreeProps" check-strictly show-checkbox v-loading="treeLoading" ref="menuTree">
         </el-tree>
       </el-card>
     </div>
@@ -410,9 +410,9 @@
       height: calc(100% - 50px);
   }
 
-  .el-tree{
+ /* .el-tree{
     height: calc(100% - 60px);
     overflow-y: scroll;
-  }
+  }*/
 </style>
 
