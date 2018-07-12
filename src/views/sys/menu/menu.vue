@@ -4,7 +4,7 @@
 
       <!-- 功能按钮 start -->
       <el-row class="main-top-group">
-        <el-button v-waves type="primary" @click="handleCreateMenu">新增菜单</el-button>
+        <el-button v-if="sys_menu_save" v-waves type="primary" @click="handleCreateMenu">新增菜单</el-button>
       </el-row>
       <!-- 功能按钮 end -->
 
@@ -42,9 +42,9 @@
 
         <el-table-column fixed="right" label="操作" width="300" align="center">
           <template slot-scope="scope">
-            <el-button size="mini" type="success" v-waves @click="handleModifyMenu(scope.row)">编辑</el-button>
-            <el-button size="mini" type="danger" v-waves @click="deleteMenu(scope.row)">删除</el-button>
-            <el-button size="mini" type="warning" v-waves @click="handleCreateNextMenu(scope.row)">新增下级菜单</el-button>
+            <el-button v-if="sys_menu_modify" size="mini" type="success" v-waves @click="handleModifyMenu(scope.row)">编辑</el-button>
+            <el-button v-if="sys_menu_delete" size="mini" type="danger" v-waves @click="deleteMenu(scope.row)">删除</el-button>
+            <el-button v-if="sys_menu_save" size="mini" type="warning" v-waves @click="handleCreateNextMenu(scope.row)">新增下级菜单</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -148,8 +148,7 @@
   </el-container>
 </template>
 <script>
-
-  import waves from "@/directive/waves/index.js"; //按钮水波纹效果
+  import { mapGetters } from "vuex";
   import { treeList, find, save, modify, del } from "@/api/sys/menu";
   import { treeToArray } from "@/utils/util";
   import { validateNumber } from  "@/utils/validate";
@@ -157,9 +156,6 @@
 
   export default {
     name: "menu",
-    directives: {
-      waves
-    },
     data() {
       return {
         listLoading: false,  //页面是否在加载
@@ -198,6 +194,7 @@
       }
     },
     computed: {
+      ...mapGetters(["permissions"]),
       /**
        * 将数据转换为树形表格数据对象
        */
@@ -220,9 +217,18 @@
       }
     },
     created() {
+      this.initPermissions();
       this.menuTreeList();
     },
     methods: {
+      /**
+       * 初始化按钮权限
+       */
+      initPermissions(){
+        this.sys_menu_save = this.permissions["sys_menu_save"];
+        this.sys_menu_modify = this.permissions["sys_menu_modify"];
+        this.sys_menu_delete = this.permissions["sys_menu_delete"];
+      },
       /**
        * 菜单树形表格数据
        */

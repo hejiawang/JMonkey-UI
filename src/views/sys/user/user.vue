@@ -4,7 +4,7 @@
 
       <!-- 功能按钮 start -->
       <el-row class="main-top-group">
-        <el-button v-waves type="primary" @click="handleCreateUser">新增用户</el-button>
+        <el-button v-if="sys_user_save" v-waves type="primary" @click="handleCreateUser">新增用户</el-button>
       </el-row>
       <!-- 功能按钮 end -->
 
@@ -36,10 +36,10 @@
         </el-table-column>
         <el-table-column fixed="right" label="操作" width="350" align="center">
           <template slot-scope="scope">
-            <el-button size="mini" type="success" v-waves @click="handleModifyUser(scope.row)">编辑</el-button>
-            <el-button size="mini" type="danger" v-waves @click="deleteUser(scope.row)">删除</el-button>
-            <el-button size="mini" type="warning" v-waves @click="handleRole(scope.row)">角色</el-button>
-            <el-button size="mini" v-waves @click="restPassword(scope.row)">密码重置</el-button>
+            <el-button v-if="sys_user_modify" size="mini" type="success" v-waves @click="handleModifyUser(scope.row)">编辑</el-button>
+            <el-button v-if="sys_user_delete" size="mini" type="danger" v-waves @click="deleteUser(scope.row)">删除</el-button>
+            <el-button v-if="sys_user_role" size="mini" type="warning" v-waves @click="handleRole(scope.row)">角色</el-button>
+            <el-button v-if="sys_user_restPasswsord" size="mini" v-waves @click="restPassword(scope.row)">密码重置</el-button>
           </template>
         </el-table-column>
 
@@ -139,7 +139,7 @@
   </el-container>
 </template>
 <script>
-  import waves from "@/directive/waves/index.js"; //按钮水波纹效果
+  import { mapGetters } from "vuex";
   import { list, find, save, modify, del, checkUserName, restPasswsord } from "@/api/sys/user";
   import { listAll, list as roleList } from  "@/api/sys/role";
   import { saveRoles } from  "@/api/sys/userRole";
@@ -147,9 +147,6 @@
 
   export default {
     name: "user",
-    directives: {
-      waves
-    },
     data () {
       /**
        * 校验手机号
@@ -240,12 +237,26 @@
         return valMap[val];
       }
     },
+    computed: {
+      ...mapGetters(["permissions"])
+    },
     created() {
+      this.initPermissions();
       this.userList();
       this.initRoleInfo();
       this.initRoleList();
     },
     methods: {
+      /**
+       * 初始化按钮权限
+       */
+      initPermissions(){
+        this.sys_user_save = this.permissions["sys_user_save"];
+        this.sys_user_modify = this.permissions["sys_user_modify"];
+        this.sys_user_delete = this.permissions["sys_user_delete"];
+        this.sys_user_restPasswsord = this.permissions["sys_user_restPasswsord"];
+        this.sys_user_role = this.permissions["sys_user_role"];
+      },
       /**
        * 用户列表数据
        */

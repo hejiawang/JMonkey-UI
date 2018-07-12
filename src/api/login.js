@@ -18,10 +18,13 @@ export const loginByUsername = (username, password, code, randomStr) => {
     method: 'post',
     params: { username, password, randomStr, code, grant_type, scope, client_id, client_secret}
   })
+}
 
-
-
-
+export const getUserInfo = ( ) => {
+  return request({
+    url: '/upms/user/info',
+    method: 'get'
+  })
 }
 
 /**

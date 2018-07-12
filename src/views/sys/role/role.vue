@@ -6,7 +6,7 @@
 
       <!-- 功能按钮 start -->
       <el-row class="main-top-group">
-        <el-button v-waves type="primary" @click="handleCreateRole">新增角色</el-button>
+        <el-button v-if="sys_role_save" v-waves type="primary" @click="handleCreateRole">新增角色</el-button>
 
         <el-input placeholder="请输入查询内容" v-model="search.value"  class="main-search">
           <i slot="suffix" class="el-input__icon el-icon-close" @click="restSearch"></i>
@@ -35,9 +35,9 @@
 
         <el-table-column fixed="right" label="操作" width="300" align="center">
           <template slot-scope="scope">
-            <el-button size="mini" type="success" v-waves @click="handleModifyRole(scope.row)">编辑</el-button>
-            <el-button size="mini" type="danger" v-waves @click="deleteRole(scope.row)">删除</el-button>
-            <el-button size="mini" type="warning" v-waves @click="authorizeTag(scope.row)">授权</el-button>
+            <el-button v-if="sys_role_modify" size="mini" type="success" v-waves @click="handleModifyRole(scope.row)">编辑</el-button>
+            <el-button v-if="sys_role_delete" size="mini" type="danger" v-waves @click="deleteRole(scope.row)">删除</el-button>
+            <el-button v-if="sys_role_menu" size="mini" type="warning" v-waves @click="authorizeTag(scope.row)">授权</el-button>
             <el-button size="mini" v-waves type="info">用户</el-button>
           </template>
         </el-table-column>
@@ -100,16 +100,13 @@
   </el-container>
 </template>
 <script>
-  import waves from "@/directive/waves/index.js"; //按钮水波纹效果
+  import { mapGetters } from "vuex";
   import { list, find, save, modify, del, checkCode, checkName } from "@/api/sys/role";
   import { treeList } from "@/api/sys/menu";
   import { findMenuByRole, modifyAuth } from  "@/api/sys/roleMenu";
 
   export default {
     name: "role",
-    directives: {
-      waves
-    },
     data () {
       /**
        * 校验角色名称是否存在
@@ -187,11 +184,24 @@
         authorizeRole: null,
       }
     },
+    computed: {
+      ...mapGetters(["permissions"])
+    },
     created() {
+      this.initPermissions();
       this.roleList();
       this.menuTreeList();
     },
     methods: {
+      /**
+       * 初始化按钮权限
+       */
+      initPermissions(){
+        this.sys_role_save = this.permissions["sys_role_save"];
+        this.sys_role_modify = this.permissions["sys_role_modify"];
+        this.sys_role_delete = this.permissions["sys_role_delete"];
+        this.sys_role_menu = this.permissions["sys_role_menu"];
+      },
       /**
        * 角色列表数据
        */

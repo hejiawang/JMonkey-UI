@@ -59,13 +59,9 @@
   </el-container>
 </template>
 <script>
-  import waves from "@/directive/waves/index.js";
 
   export default {
     name: "home",
-    directives: {
-      waves
-    },
     data () {
       const item = [
         {

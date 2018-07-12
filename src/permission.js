@@ -13,7 +13,16 @@ router.beforeEach((to, from, next) => {
         next({ path: '/' });
         NProgress.done();
       } else {
-        next();
+        if (store.getters.roles.length === 0) {
+          store.dispatch('GetUserInfo').then(res => {
+            next({ ...to, replace: true })
+          }).catch(() => {
+              next({ path: '/login' })
+              NProgress.done()
+          })
+        } else {
+          next();
+        }
       }
   } else { //没有token，没有登录
     if (whiteList.indexOf(to.path) !== -1) {

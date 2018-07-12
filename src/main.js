@@ -11,6 +11,7 @@ import '@/assets/css/iconfont/iconfont.css'
 import store from './store'
 import 'babel-polyfill'
 import * as filters from './filters' //全局filter
+import waves from "@/directive/waves/index.js"; //按钮水波纹效果
 import './permission' // 权限
 
 Vue.config.productionTip = false
@@ -22,6 +23,8 @@ Vue.use(VueAxios, axios)
 Object.keys(filters).forEach(key => {
   Vue.filter(key, filters[key])
 })
+
+Vue.directive("waves", waves)
 
 new Vue({
   el: '#app',
