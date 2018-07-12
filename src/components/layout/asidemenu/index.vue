@@ -6,7 +6,7 @@
         <span slot="title">首页</span>
       </el-menu-item>
 
-      <el-submenu index="1">
+      <!--<el-submenu index="1">
         <template slot="title">
           <i class="icon iconfont icon-set"></i>
           <span>系统设置</span>
@@ -16,18 +16,26 @@
           <el-menu-item index="/sys/role">角色管理</el-menu-item>
           <el-menu-item index="/sys/menu">菜单管理</el-menu-item>
         </el-menu-item-group>
-      </el-submenu>
+      </el-submenu>-->
 
-      <el-submenu index="2">
-        <template slot="title">
-          <i class="el-icon-location"></i>
-          <span>导航二</span>
-        </template>
-        <el-menu-item-group>
-          <el-menu-item index="2-1">选项1</el-menu-item>
-          <el-menu-item index="2-1">选项2</el-menu-item>
-        </el-menu-item-group>
-      </el-submenu>
+      <template v-for="(item, index) in menu">
+        <el-menu-item v-if=" item.children.length === 0 " :index="item.path">
+          <i v-if="item.icon" :class="item.icon"></i> <span slot="title">{{item.name}}</span>
+        </el-menu-item>
+
+        <el-submenu v-else :index="menu.id">
+          <template slot="title"> <i v-if="item.icon" :class="item.icon"></i> <span>{{item.name}}</span> </template>
+
+          <el-menu-item-group>
+            <el-menu-item v-for="( child, index ) in item.children" :key="child.id" :index="child.path">
+              <i v-if="child.icon" :class="child.icon"></i>
+              {{child.name}}
+            </el-menu-item>
+          </el-menu-item-group>
+        </el-submenu>
+      </template>
+
+
     </el-menu>
   </el-aside>
 </template>
