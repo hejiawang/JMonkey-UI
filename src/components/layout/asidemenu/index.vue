@@ -44,6 +44,7 @@
   import store from '@/store';
   import { mapGetters } from "vuex";
   import { validatenull } from "@/utils/validate";
+  import { initMenu } from "@/router/router";
 
   export default {
     name: "asideMenu",
@@ -56,7 +57,7 @@
     created() {
       if (validatenull(this.menu)) {
         store.dispatch("GetMenu").then(data => {
-          console.info(data);
+          initMenu( this.$router, data );
         });
       }
     }
