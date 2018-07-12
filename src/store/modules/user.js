@@ -1,6 +1,6 @@
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { setStore, getStore } from '@/utils/store'
-import { loginByUsername, logout, getUserInfo } from '@/api/login'
+import { loginByUsername, logout, getUserInfo, getMenuInfo } from '@/api/login'
 
 const user = {
   state: {
@@ -8,6 +8,7 @@ const user = {
     userInfo: getStore({ name: 'userInfo' }) || {},
     permissions: getStore({ name: 'permissions' }) || {},
     roles: getStore({ name: 'roles' }) || [],
+    menu: getStore({ name: 'menu' }) || [],
   },
   actions: {
     /**
@@ -53,6 +54,24 @@ const user = {
         })
       })
     },
+    /**
+     * 获取用户左侧显示的菜单数据
+     * @param commit
+     * @returns {Promise}
+     * @constructor
+     */
+    GetMenu({ commit, state, dispatch }) {
+      return new Promise( (resolve, reject) => {
+        getMenuInfo().then((data) => {
+          const menu = data.result;
+
+          commit('SET_MENU', menu);
+          resolve(menu);
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    }
   },
   mutations: {
     SET_ACCESS_TOKEN: (state, access_token) => {
@@ -98,7 +117,15 @@ const user = {
         content: state.permissions,
         type: 'session'
       })
-    }
+    },
+    SET_MENU: (state, menu) => {
+      state.menu = menu
+      setStore({
+        name: 'menu',
+        content: state.menu,
+        type: 'session'
+      })
+    },
   }
 }
 

@@ -27,7 +27,11 @@
             <span>{{ scope.row.type | menuTypeFilter }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="icon" label="图标" show-overflow-tooltip width="100"/>
+        <el-table-column prop="icon" label="图标" show-overflow-tooltip width="100">
+          <template slot-scope="scope">
+            <i :class="scope.row.icon" v-if="scope.row.icon"></i>
+          </template>
+        </el-table-column>
         <el-table-column prop="sort" label="排序" show-overflow-tooltip width="100">
           <template slot-scope="scope">
             <el-input v-if="scope.row.sortEdit" :ref="scope.row.id" v-model.number="scope.row.sort" size="small" style="width: 70px" @keyup.enter.native="handleModifySort(scope.row)" @blur="handleModifySort(scope.row)" />
@@ -44,7 +48,7 @@
           <template slot-scope="scope">
             <el-button v-if="sys_menu_modify" size="mini" type="success" v-waves @click="handleModifyMenu(scope.row)">编辑</el-button>
             <el-button v-if="sys_menu_delete" size="mini" type="danger" v-waves @click="deleteMenu(scope.row)">删除</el-button>
-            <el-button v-if="sys_menu_save" size="mini" type="warning" v-waves @click="handleCreateNextMenu(scope.row)">新增下级菜单</el-button>
+            <el-button v-if="sys_menu_save && scope.row.type == 'Menu' " size="mini" type="warning" v-waves @click="handleCreateNextMenu(scope.row)">新增下级菜单</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -78,10 +82,15 @@
                 <i class="el-icon-question message-info"></i>
               </el-tooltip>
             </el-col>
-            <el-col :span="12">
+            <el-col :span="11">
               <el-form-item label="菜单图标" prop="icon">
                 <el-input v-model="menuForm.icon" placeholder="请输入菜单图标" />
               </el-form-item>
+            </el-col>
+            <el-col :span="1" style="text-align: center;">
+              <el-tooltip class="item" effect="light" content="建议阿里图标，例：icon iconfont icon-main" placement="bottom-start">
+                <i class="el-icon-question message-info"></i>
+              </el-tooltip>
             </el-col>
           </el-row>
           <el-row>
