@@ -7,8 +7,21 @@ import { validatenull } from  "@/utils/validate";
  * @param menu
  */
 export const initMenu = (router, menu) => {
+
+  //location.reload();
+
+  console.info('initMenu');
+
   if (menu.length === 0) return;
+
+  /*formatRoutes(menu).forEach(r => {
+    router.options.routes[1].children.push(r);
+  });*/
   router.addRoutes(formatRoutes(menu));
+
+
+  //console.info(formatRoutes(menu));
+  console.info(router);
 }
 
 /**
@@ -16,6 +29,7 @@ export const initMenu = (router, menu) => {
  * @param menu
  */
 export const formatRoutes = (treeMenu) => {
+  console.info('formatRoutes');
   const aRouter = [];
 
   let menuList = converToList(treeMenu);
