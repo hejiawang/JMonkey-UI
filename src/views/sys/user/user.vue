@@ -128,8 +128,8 @@
             </template>
           </el-table-column>
         </el-table>
-        <el-pagination @size-change="handleRoleSizeChange" @current-change="handleRoleCurrentChange" :current-page.sync="roleListQuery.current" :page-sizes="[10,20,30,50]" :page-size="roleListQuery.size" layout="total, sizes, prev, pager, next, jumper" :total="roleListTotal" />
         <div slot="footer" class="dialog-footer">
+          <el-pagination @size-change="handleRoleSizeChange" @current-change="handleRoleCurrentChange" :current-page.sync="roleListQuery.current" :page-sizes="[10,20,30,50]" :page-size="roleListQuery.size" layout="total, sizes, prev, pager, next, jumper" :total="roleListTotal" style="float: left"/>
           <el-button v-waves @click="cancelRoleDialog()">取 消</el-button>
           <el-button v-waves type="primary" @click="saveRoles()">确 定</el-button>
         </div>
@@ -281,6 +281,8 @@
           this.roleListTotal = data.total;
           this.roleTableData = data.rows;
           this.roleListLoading = false;
+
+          if(this.roleDialogVisible) this.roleDialogOpen();
         });
       },
       /**

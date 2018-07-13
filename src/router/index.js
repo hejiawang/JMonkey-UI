@@ -3,9 +3,9 @@ import Router from 'vue-router'
 import login from '@/views/login/index'
 import main from '@/components/layout/main'
 import home from '@/views/home/home'
-//import user from '@/views/sys/user/user'
-import menu from '@/views/sys/menu/menu'
-import role from '@/views/sys/role/role'
+
+import store from '@/store';
+import { formatRoutes } from './router'
 
 Vue.use(Router)
 
@@ -21,11 +21,8 @@ export default new Router({
       name: 'main',
       component: main,
       children: [
-        { path: '/home', name: '首页', component: home }
-
-        //,{ path: '/sys/user', name: '用户管理', component: user }
-        ,{ path: '/sys/menu', name: '菜单管理', component: menu }
-        ,{ path: '/sys/role', name: '角色管理', component: role }
+        { path: '/home', name: '首页', component: home },
+        ...formatRoutes(store.getters.menu)
       ]
     },
     {
