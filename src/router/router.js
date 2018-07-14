@@ -7,21 +7,19 @@ import { validatenull } from  "@/utils/validate";
  * @param menu
  */
 export const initMenu = (router, menu) => {
-
-  //location.reload();
-
-  console.info('initMenu');
-
   if (menu.length === 0) return;
 
-  /*formatRoutes(menu).forEach(r => {
-    router.options.routes[1].children.push(r);
-  });*/
-  router.addRoutes(formatRoutes(menu));
+  let baseRouter = {
+    path: '/main',
+    name: 'main',
+    component(resolve) { require(['../components/layout/main' ], resolve) },
+    children: [
+      { path: '/home', name: '首页', component(resolve) { require(['../views/home/home' ], resolve) } }
+    ]
+  };
 
-
-  //console.info(formatRoutes(menu));
-  console.info(router);
+  formatRoutes(menu).forEach(r => { baseRouter.children.push(r); });
+  router.addRoutes( [baseRouter] );
 }
 
 /**
@@ -29,7 +27,6 @@ export const initMenu = (router, menu) => {
  * @param menu
  */
 export const formatRoutes = (treeMenu) => {
-  console.info('formatRoutes');
   const aRouter = [];
 
   let menuList = converToList(treeMenu);

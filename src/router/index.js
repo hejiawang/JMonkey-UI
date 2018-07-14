@@ -9,8 +9,6 @@ import { formatRoutes } from './router'
 
 Vue.use(Router)
 
-//children: [].concat(...formatRoutes(store.state.user.menu), [{ path: '/home', name: '首页', component: home }])
-
 export default new Router({
   routes: [
     {
