@@ -7,6 +7,8 @@ import { validatenull } from  "@/utils/validate";
  * @param menu
  */
 export const initMenu = (router, menu) => {
+  //TODO 没找到直接向子路由中动态添加路由的方式，这里添加路由的方式应该在修改修改
+
   if (menu.length === 0) return;
 
   let baseRouter = {

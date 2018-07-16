@@ -6,5 +6,10 @@ export default {
       '是一个基于vue+vuex+vue-router快速后台管理系统，采用token交互验证方式。',
       '作者：赫家旺 952327407@qq.com'
     ]
+  },
+  header: {
+    title: [
+      '欢迎登录xxx管理系统'
+    ]
   }
 }

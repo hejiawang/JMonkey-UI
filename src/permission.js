@@ -35,5 +35,10 @@ router.beforeEach((to, from, next) => {
 });
 
 router.afterEach((to, from) => {
+  if( to.name == '首页' ) store.commit('SET_CRUMB',  [to.name]);
+  else store.commit('SET_CRUMB',  [ '系统设置',to.name]);
+
   NProgress.done();
 })
+
+
