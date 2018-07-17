@@ -60,7 +60,7 @@
         <el-form :model="menuForm" :rules="menuRules" ref="menuForm" label-width="100px">
           <el-row>
             <el-col :span="12">
-              <el-form-item label="父级菜单父级菜单父级菜单父级菜单父级菜单" prop="parentId">
+              <el-form-item label="父级菜单" prop="parentId">
                 <el-input v-model="menuForm.parentName" placeholder="请输入父级菜单" @focus="handleMenuTree()" readonly/>
                 <el-input v-model="menuForm.parentId" type="hidden" style="display: none"/>
               </el-form-item>
