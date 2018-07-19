@@ -13,7 +13,7 @@
 
         <el-table-column prop="photo" label="用户头像" show-overflow-tooltip >
           <template slot-scope="scope">
-            <img v-if="scope.row.photo" class="userPhoto" :src="scope.row.photo">
+            <img v-if="scope.row.photo" class="userPhoto" :src="website.filePath + scope.row.photo">
             <img v-else class="userPhoto" src="../../../assets/img/userDefaule.png">
           </template>
         </el-table-column>
@@ -62,13 +62,10 @@
           <el-row>
             <el-col :span="12">
               <el-form-item label="用户头像" prop="photo">
-                <el-upload
-                  action="/upms/user/uploadPhoto"
-                  :on-success="handleUserPhotoSuccess"
-                  :before-upload="beforeUserPhotoUpload"
-                  class="avatar-uploader"
-                  :show-file-list="false">
-                  <i class="el-icon-plus avatar-uploader-icon"></i>
+                <el-upload action="/upms/user/uploadPhoto" class="avatar-uploader" :show-file-list="false"
+                  :on-success="handleUserPhotoSuccess" :before-upload="beforeUserPhotoUpload">
+                  <img v-if="userPhotoPath" :src="userPhotoPath" class="avatar">
+                  <i class="el-icon-plus avatar-uploader-icon" v-else></i>
                 </el-upload>
               </el-form-item>
             </el-col>
@@ -80,10 +77,10 @@
                   </el-form-item>
                 </el-col>
               </el-row>
-              <el-row>
+              <el-row v-if=" userDialogStatus == 'createUser' ">
                 <el-col :span="22">
                   <el-form-item label="登录密码" prop="password">
-                    <el-input v-model="userForm.password" placeholder="请输入登录密码" type="password" maxlength="20" :disabled="userDialogStatus != 'createUser'"/>
+                    <el-input v-model="userForm.password" placeholder="请输入登录密码" type="password" maxlength="20"/>
                   </el-form-item>
                 </el-col>
                 <el-col :span="2" style="text-align: center;">
@@ -170,6 +167,7 @@
   import { listAll, list as roleList } from  "@/api/sys/role";
   import { saveRoles } from  "@/api/sys/userRole";
   import { validatePhone } from  "@/utils/validate";
+  import {validatenull} from "../../../utils/validate";
 
   export default {
     name: "user",
@@ -251,7 +249,9 @@
           phone: [
             { required: true, trigger: 'blur', validator: validPhone }
           ],
-        }
+          realName: { required: true, message: "请输入真实姓名", trigger: "blur" }
+        },
+        userPhotoPath:"",
       }
     },
     filters:{
@@ -265,7 +265,8 @@
       }
     },
     computed: {
-      ...mapGetters(["permissions", "website"])
+      ...mapGetters(["permissions"]),
+      ...mapGetters(["website"])
     },
     created() {
       this.initPermissions();
@@ -362,6 +363,8 @@
 
         find( row.id ).then( data => {
           this.userForm = data.result;
+          this.userForm.password = "";
+          if( !validatenull(data.result.photo) ) this.userPhotoPath = this.website.filePath + data.result.photo;
 
           this.userDialogStatus = "modifyUser";
           this.userDialogFormVisible = true;
@@ -428,6 +431,7 @@
           birthday: "",
           photo: "",
         }
+        this.userPhotoPath = "";
       },
       /**
        * 分配角色dialog
@@ -503,16 +507,24 @@
        * @returns {boolean}
        */
       beforeUserPhotoUpload(file){
+        const isImg = file.type === "image/jpeg" || file.type === "image/png";
+        if( !isImg ) this.$message.error('上传头像图片只能是JPG或PNG格式!');
+
         const isLt1M = file.size / 1024 / 1024 < 1;
-
         if (!isLt1M) this.$message.error('上传头像图片大小不能超过 1MB!');
-        return isLt1M;
-      },
-      handleUserPhotoSuccess(data, file) {
-        if( data.success ){
-          this.website.filePath + data.result;
-        }
 
+        return isLt1M && isImg;
+      },
+      /**
+       * 上传用户头像成功后的回调函数
+       * @param data
+       * @param file
+       */
+      handleUserPhotoSuccess(data, file) {
+        if( data.isSuccess ){
+          this.userPhotoPath = this.website.filePath + data.result;
+          this.userForm.photo = data.result;
+        }
       }
     }
   };
