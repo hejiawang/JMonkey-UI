@@ -363,7 +363,6 @@
 
         find( row.id ).then( data => {
           this.userForm = data.result;
-          this.userForm.password = "";
           if( !validatenull(data.result.photo) ) this.userPhotoPath = this.website.filePath + data.result.photo;
 
           this.userDialogStatus = "modifyUser";
