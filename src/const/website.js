@@ -11,5 +11,6 @@ export default {
     title: [
       '欢迎登录xxx管理系统'
     ]
-  }
+  },
+  filePath: "http://114.116.89.11:8090/"
 }

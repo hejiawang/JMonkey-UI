@@ -11,6 +11,12 @@
       <!-- 列表 start -->
       <el-table :data="userTableData" ref="userTable" height="calc(100% - 80px)" tooltip-effect="dark" v-loading="listLoading">
 
+        <el-table-column prop="photo" label="用户头像" show-overflow-tooltip >
+          <template slot-scope="scope">
+            <img v-if="scope.row.photo" class="userPhoto" :src="scope.row.photo">
+            <img v-else class="userPhoto" src="../../../assets/img/userDefaule.png">
+          </template>
+        </el-table-column>
         <el-table-column prop="username" label="用户名称" show-overflow-tooltip/>
         <el-table-column prop="realName" label="真实名称" show-overflow-tooltip/>
         <el-table-column prop="roleList" label="用户角色" show-overflow-tooltip>
@@ -55,31 +61,51 @@
         <el-form :model="userForm" :rules="userRules" ref="userForm" label-width="100px">
           <el-row>
             <el-col :span="12">
-              <el-form-item label="用户名称" prop="username">
-                <el-input v-model="userForm.username" placeholder="请输入用户名称" maxlength="20"/>
-              </el-form-item>
-            </el-col>
-            <el-col :span="11">
-              <el-form-item v-if=" userDialogStatus == 'createUser' " label="登录密码" prop="password">
-                <el-input v-model="userForm.password" placeholder="请输入登录密码" type="password" maxlength="20"/>
-              </el-form-item>
-            </el-col>
-            <el-col :span="1" style="text-align: center;">
-              <el-tooltip class="item" effect="light" content="默认密码：123456" placement="bottom-start" v-if=" userDialogStatus == 'createUser' ">
-                <i class="el-icon-question message-info"></i>
-              </el-tooltip>
-            </el-col>
-          </el-row>
-          <el-row>
-            <el-col :span="12">
-              <el-form-item label="真实姓名" prop="realName">
-                <el-input v-model="userForm.realName" placeholder="请输入真实姓名" maxlength="20"/>
+              <el-form-item label="用户头像" prop="photo">
+                <el-upload
+                  action="/upms/user/uploadPhoto"
+                  :on-success="handleUserPhotoSuccess"
+                  :before-upload="beforeUserPhotoUpload"
+                  class="avatar-uploader"
+                  :show-file-list="false">
+                  <i class="el-icon-plus avatar-uploader-icon"></i>
+                </el-upload>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="手机号码" prop="phone">
-                <el-input v-model="userForm.phone" placeholder="请输入手机号码" />
-              </el-form-item>
+              <el-row>
+                <el-col :span="24">
+                  <el-form-item label="用户名称" prop="username">
+                    <el-input v-model="userForm.username" placeholder="请输入用户名称" maxlength="20"/>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              <el-row>
+                <el-col :span="22">
+                  <el-form-item label="登录密码" prop="password">
+                    <el-input v-model="userForm.password" placeholder="请输入登录密码" type="password" maxlength="20" :disabled="userDialogStatus != 'createUser'"/>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="2" style="text-align: center;">
+                  <el-tooltip class="item" effect="light" content="默认密码：123456" placement="bottom-start">
+                    <i class="el-icon-question message-info"></i>
+                  </el-tooltip>
+                </el-col>
+              </el-row>
+              <el-row>
+                <el-col :span="24">
+                  <el-form-item label="真实姓名" prop="realName">
+                    <el-input v-model="userForm.realName" placeholder="请输入真实姓名" maxlength="20"/>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              <el-row>
+                <el-col :span="24">
+                  <el-form-item label="手机号码" prop="phone">
+                    <el-input v-model="userForm.phone" placeholder="请输入手机号码" />
+                  </el-form-item>
+                </el-col>
+              </el-row>
             </el-col>
           </el-row>
           <el-row>
@@ -209,7 +235,8 @@
           phone: "",
           roleIdList: [],
           sex: "Man",
-          birthday: ""
+          birthday: "",
+          photo: "",
         },
         userRules: {  //user form rule
           username: [
@@ -238,7 +265,7 @@
       }
     },
     computed: {
-      ...mapGetters(["permissions"])
+      ...mapGetters(["permissions", "website"])
     },
     created() {
       this.initPermissions();
@@ -398,7 +425,8 @@
           phone: "",
           roleIdList: [],
           sex: "Man",
-          birthday: ""
+          birthday: "",
+          photo: "",
         }
       },
       /**
@@ -469,8 +497,57 @@
         this.roleListQuery.current = val;
         this.initRoleList()
       },
+      /**
+       * 上传用户头像的图片条件
+       * @param file
+       * @returns {boolean}
+       */
+      beforeUserPhotoUpload(file){
+        const isLt1M = file.size / 1024 / 1024 < 1;
+
+        if (!isLt1M) this.$message.error('上传头像图片大小不能超过 1MB!');
+        return isLt1M;
+      },
+      handleUserPhotoSuccess(data, file) {
+        if( data.success ){
+          this.website.filePath + data.result;
+        }
+
+      }
     }
   };
 
 
 </script>
+<style lang="scss">
+  .userPhoto {
+    height: 30px;
+    width: 30px
+  }
+
+  .avatar-uploader {
+    .el-upload {
+      border: 1px dashed #d9d9d9;
+      border-radius: 6px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .el-upload:hover {
+      border-color: #409EFF;
+    }
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 193px;
+    height: 193px;
+    line-height: 193px;
+    text-align: center;
+  }
+  .avatar {
+    width: 193px;
+    height: 193px;
+    display: block;
+  }
+</style>
