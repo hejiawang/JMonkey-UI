@@ -35,10 +35,25 @@ router.beforeEach((to, from, next) => {
 });
 
 router.afterEach((to, from) => {
-  if( to.name == '首页' ) store.commit('SET_CRUMB',  [to.name]);
-  else store.commit('SET_CRUMB',  [ '系统设置',to.name]);
-
-  NProgress.done();
+  let toPath = to.path;
+  let treeMenu = store.getters.menu;
+  treeMenu.forEach( menu => {
+    if( menu.path == toPath  ){
+      store.commit('SET_CRUMB',  [to.name]);
+      NProgress.done();
+      return ;
+    } else {
+      if( menu.children.length > 0 ){
+        menu.children.forEach( cMenu => {
+          if( cMenu.path == toPath  ){
+            store.commit('SET_CRUMB',  [menu.name, to.name]);
+            NProgress.done();
+            return ;
+          }
+        });
+      }
+    }
+  });
 })
 
 

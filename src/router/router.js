@@ -15,9 +15,7 @@ export const initMenu = (router, menu) => {
     path: '/main',
     name: 'main',
     component(resolve) { require(['../components/layout/main' ], resolve) },
-    children: [
-      { path: '/home', name: '首页', component(resolve) { require(['../views/home/home' ], resolve) } }
-    ]
+    children: [ ]
   };
 
   formatRoutes(menu).forEach(r => { baseRouter.children.push(r); });
