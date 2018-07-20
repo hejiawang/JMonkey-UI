@@ -50,9 +50,8 @@
       <!-- 分页 end -->
 
       <!-- 新增修改角色 start -->
-      <el-dialog :title="textMap[roleDialogStatus]" :visible.sync="roleDialogFormVisible">
-
-        <el-form :model="roleForm" :rules="roleRules" ref="roleForm" label-width="100px">
+      <el-dialog :title="textMap[roleDialogStatus]" :visible.sync="roleDialogFormVisible"  >
+        <el-form :model="roleForm" :rules="roleRules" ref="roleForm" label-width="100px" v-loading="formLoading" element-loading-background="rgba(255, 255, 255, 0.3)">
 
           <el-row>
             <el-col :span="12">
@@ -75,8 +74,8 @@
 
         <div slot="footer" class="dialog-footer">
           <el-button v-waves @click="cancelRoleForm('roleForm')">取 消</el-button>
-          <el-button v-waves type="primary" v-if=" roleDialogStatus == 'createRole' " @click="createRole('roleForm')">确 定</el-button>
-          <el-button v-waves type="primary" v-else @click="modifyRole('roleForm')">修 改</el-button>
+          <el-button v-waves :disabled="isSubmit" type="primary" v-if=" roleDialogStatus == 'createRole' " @click="createRole('roleForm')">确 定</el-button>
+          <el-button v-waves :disabled="isSubmit" type="primary" v-else @click="modifyRole('roleForm')">修 改</el-button>
         </div>
       </el-dialog>
       <!-- 新增修改角色 end -->
@@ -136,6 +135,8 @@
       }
 
       return {
+        isSubmit: false,  //是否在提交数据
+        formLoading: false, //新增修改角色表单是否正在提交
         listLoading: false,  //页面是否在加载
         treeLoading: false,
         roleDialogFormVisible: false, //是否显示角色 dialog
@@ -278,13 +279,17 @@
        * @param formName
        */
       createRole(formName){
+        this.isSubmit = true;
         this.$refs[formName].validate(valid => {
           if (valid) {
+            this.formLoading = true;
             save(this.roleForm).then(() => {
               this.cancelRoleForm(formName);
               this.roleList();
               this.$notify({ title: "成功", message: "创建成功", type: "success", duration: 2000 });
             });
+          } else {
+            this.isSubmit = false;
           }
         })
       },
@@ -307,13 +312,17 @@
        * @param formName
        */
       modifyRole(formName){
+        this.isSubmit = true;
         this.$refs[formName].validate(valid => {
           if (valid) {
+            this.formLoading = true;
             modify(this.roleForm).then(() => {
               this.cancelRoleForm(formName);
               this.roleList();
               this.$notify({ title: "成功", message: "修改成功", type: "success", duration: 2000 });
             });
+          } else {
+            this.isSubmit = false;
           }
         })
       },
@@ -323,6 +332,8 @@
        */
       cancelRoleForm(formName){
         this.roleDialogFormVisible = false;
+        this.formLoading = false;
+        this.isSubmit = false;
         this.restRoleForm();
         this.$refs[formName].resetFields();
       },

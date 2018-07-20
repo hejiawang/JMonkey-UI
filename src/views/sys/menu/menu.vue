@@ -57,7 +57,7 @@
       <!-- 新增修改菜单 start -->
       <el-dialog :title="textMap[menuDialogStatus]" :visible.sync="menuDialogFormVisible">
 
-        <el-form :model="menuForm" :rules="menuRules" ref="menuForm" label-width="100px">
+        <el-form :model="menuForm" :rules="menuRules" ref="menuForm" label-width="100px" v-loading="formLoading" element-loading-background="rgba(255, 255, 255, 0.3)">
           <el-row>
             <el-col :span="12">
               <el-form-item label="父级菜单" prop="parentId">
@@ -141,8 +141,8 @@
 
         <div slot="footer" class="dialog-footer">
           <el-button v-waves @click="cancelMenuForm('menuForm')">取 消</el-button>
-          <el-button v-waves type="primary" v-if=" menuDialogStatus == 'createMenu' " @click="createMenu('menuForm')">确 定</el-button>
-          <el-button v-waves type="primary" v-else @click="modifyMenu('menuForm')">修 改</el-button>
+          <el-button v-waves :disabled="isSubmit" type="primary" v-if=" menuDialogStatus == 'createMenu' " @click="createMenu('menuForm')">确 定</el-button>
+          <el-button v-waves :disabled="isSubmit" type="primary" v-else @click="modifyMenu('menuForm')">修 改</el-button>
         </div>
       </el-dialog>
       <!-- 新增修改菜单 start -->
@@ -167,6 +167,8 @@
     name: "menu",
     data() {
       return {
+        isSubmit: false,  //是否在提交数据
+        formLoading: false, //新增修改菜单表单是否正在提交
         listLoading: false,  //页面是否在加载
         menuDialogTreeVisible: false,  //父级菜单树dislog
         menuDialogFormVisible: false, //是否显示菜单 dialog
@@ -275,13 +277,17 @@
        * @param formName
        */
       createMenu(formName){
+        this.isSubmit = true;
         this.$refs[formName].validate(valid => {
           if (valid) {
+            this.formLoading = true;
             save(this.menuForm).then(() => {
               this.cancelMenuForm(formName);
               this.menuTreeList();
               this.$notify({ title: "成功", message: "创建成功", type: "success", duration: 2000 });
             });
+          } else {
+            this.isSubmit = false;
           }
         })
       },
@@ -304,13 +310,17 @@
        * @param formName
        */
       modifyMenu(formName){
+        this.isSubmit = true;
         this.$refs[formName].validate(valid => {
           if (valid) {
+            this.formLoading = true;
             modify(this.menuForm).then(() => {
               this.cancelMenuForm(formName);
               this.menuTreeList();
               this.$notify({ title: "成功", message: "修改成功", type: "success", duration: 2000 });
             });
+          } else {
+            this.isSubmit = true;
           }
         })
       },
@@ -329,6 +339,8 @@
        */
       cancelMenuForm(formName){
         this.menuDialogFormVisible = false;
+        this.formLoading = false;
+        this.isSubmit = false;
         this.restMenuForm();
         this.$refs[formName].resetFields();
       },

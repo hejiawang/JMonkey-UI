@@ -58,7 +58,7 @@
 
       <!-- 新增修改用户 start -->
       <el-dialog :title="textMap[userDialogStatus]" :visible.sync="userDialogFormVisible">
-        <el-form :model="userForm" :rules="userRules" ref="userForm" label-width="100px">
+        <el-form :model="userForm" :rules="userRules" ref="userForm" label-width="100px" v-loading="formLoading" element-loading-background="rgba(255, 255, 255, 0.3)">
           <el-row>
             <el-col :span="12">
               <el-form-item label="用户头像" prop="photo">
@@ -130,14 +130,14 @@
 
         <div slot="footer" class="dialog-footer">
           <el-button v-waves @click="cancelUserForm('userForm')">取 消</el-button>
-          <el-button v-waves type="primary" v-if=" userDialogStatus == 'createUser' " @click="createUser('userForm')">确 定</el-button>
-          <el-button v-waves type="primary" v-else @click="modifyUser('userForm')">修 改</el-button>
+          <el-button v-waves :disabled="isSubmit" type="primary" v-if=" userDialogStatus == 'createUser' " @click="createUser('userForm')">确 定</el-button>
+          <el-button v-waves :disabled="isSubmit" type="primary" v-else @click="modifyUser('userForm')">修 改</el-button>
         </div>
       </el-dialog>
       <!-- 新增修改用户 end -->
 
       <!-- 分配角色 start -->
-      <el-dialog title="分配角色" :visible="roleDialogVisible" class="main-dialog-table" @open="roleDialogOpen">
+      <el-dialog title="分配角色" :visible="roleDialogVisible" @open="roleDialogOpen">
 
         <el-table :data="roleTableData" ref="roleTable" height="300px" tooltip-effect="dark" v-loading="roleListLoading" @selection-change="handleRoleSelect">
           <el-table-column type="selection" width="50"/>
@@ -202,6 +202,8 @@
       };
 
       return {
+        isSubmit: false,  //是否在提交数据
+        formLoading: false, //新增修改用户表单是否正在提交
         listLoading: false,  //页面是否在加载
         userDialogFormVisible: false, //是否显示user dialog
         userTableData: null,   //用户列表数据
@@ -374,13 +376,17 @@
        * @param formName
        */
       modifyUser(formName){
+        this.isSubmit = true;
         this.$refs[formName].validate(valid => {
           if (valid) {
+            this.formLoading = true;
             modify(this.userForm).then(() => {
               this.cancelUserForm(formName);
               this.userList();
               this.$notify({ title: "成功", message: "修改成功", type: "success", duration: 2000 });
             });
+          } else {
+            this.isSubmit = true;
           }
         })
       },
@@ -397,13 +403,17 @@
        * @param formName
        */
       createUser(formName){
+        this.isSubmit = true;
         this.$refs[formName].validate(valid => {
           if (valid) {
+            this.formLoading = true;
             save(this.userForm).then(() => {
               this.cancelUserForm(formName);
               this.userList();
               this.$notify({ title: "成功", message: "创建成功", type: "success", duration: 2000 });
             });
+          } else {
+            this.isSubmit = false;
           }
         })
       },
@@ -413,6 +423,8 @@
        */
       cancelUserForm(formName){
         this.userDialogFormVisible = false;
+        this.formLoading = false;
+        this.isSubmit = false;
         this.restUserForm();
         this.$refs[formName].resetFields();
       },
