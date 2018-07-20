@@ -88,6 +88,7 @@ const user = {
         commit('SET_ROLES', [])
         commit('SET_MENU', [])
         commit('SET_PERMISSIONS', [])
+        commit('SET_CRUMB', ['首页'])
 
         removeToken()
         resolve()

@@ -3,6 +3,11 @@
     <aside-user></aside-user>
 
     <el-menu default-active="/home" background-color="#00142a" text-color="#fff" active-text-color="#409eff" unique-opened collapse-transition router>
+      <el-menu-item  index="/home">
+        <i class="icon iconfont icon-main"></i>
+        <span slot="title">首页</span>
+      </el-menu-item>
+
       <template v-for="(item, index) in menu">
         <el-menu-item v-if=" item.children.length === 0 " :index="item.path">
           <i v-if="item.icon" :class="item.icon"></i> <span slot="title">{{item.name}}</span>
