@@ -81,3 +81,35 @@ export function checkUserName( id, userName ) {
     method: 'post',
   })
 }
+
+/**
+ * 校验原始密码是否正确
+ * @param id
+ * @param password
+ */
+export function checkPassword(id, password) {
+  return request({
+    url: '/upms/user/checkPassword',
+    data: {
+      id: id,
+      password: password
+    },
+    method: 'post',
+  })
+}
+
+/**
+ * 修改用户密码
+ * @param id 用户密码
+ * @param password 新密码
+ */
+export function mofidyPasswsord(id, password) {
+  return request({
+    url: '/upms/user/mofidyPasswsord',
+    method: 'put',
+    data: {
+      id: id,
+      password: password
+    }
+  })
+}

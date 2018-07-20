@@ -8,7 +8,7 @@ import { Message } from 'element-ui'
 
 NProgress.configure({ showSpinner: false });
 
-axios.defaults.timeout = 30000; //超时时间
+axios.defaults.timeout = 50000; //超时时间
 axios.defaults.withCredentials = true;  // 跨域请求，允许保存cookie
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
