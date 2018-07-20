@@ -103,9 +103,9 @@ export function checkPassword(id, password) {
  * @param id 用户密码
  * @param password 新密码
  */
-export function mofidyPasswsord(id, password) {
+export function modifyPassword(id, password) {
   return request({
-    url: '/upms/user/mofidyPasswsord',
+    url: '/upms/user/modifyPassword',
     method: 'put',
     data: {
       id: id,

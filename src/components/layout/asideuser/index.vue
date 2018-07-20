@@ -44,7 +44,7 @@
 <script>
   import store from '@/store';
   import { mapGetters } from "vuex";
-  import { checkPassword, mofidyPasswsord } from "@/api/sys/user";
+  import { checkPassword, modifyPassword } from "@/api/sys/user";
 
   export default {
     name: "asideUser",
@@ -149,7 +149,7 @@
             this.passwordFormLoading = true;
 
             this.passwordForm.userId = this.userInfo.id;
-            mofidyPasswsord(this.userInfo.id, this.passwordForm.nowPassword).then(() => {
+            modifyPassword(this.userInfo.id, this.passwordForm.nowPassword).then(() => {
               this.cancelPasswordForm(formName);
               this.$notify({ title: "成功", message: "修改成功", type: "success", duration: 2000 });
             });
