@@ -41,5 +41,9 @@ export const getMenuInfo = () => {
  * @param refreshToken refresh_token
  */
 export const logout = (accesstoken, refreshToken) => {
-
+  return request({
+    url: '/auth/authentication/removeToken',
+    method: 'post',
+    params: { accesstoken, refreshToken }
+  })
 }

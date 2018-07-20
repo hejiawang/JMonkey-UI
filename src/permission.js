@@ -25,12 +25,10 @@ router.beforeEach((to, from, next) => {
         }
       }
   } else { //没有token，没有登录
-    if (whiteList.indexOf(to.path) !== -1) {
-      next();
-    } else {
-      next('/login');
-      NProgress.done();
-    }
+    if (whiteList.indexOf(to.path) !== -1) next();
+    else next('/login');
+
+    NProgress.done();
   }
 });
 

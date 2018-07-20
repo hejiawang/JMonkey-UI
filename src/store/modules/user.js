@@ -24,6 +24,7 @@ const user = {
       return new Promise((resolve, reject) => {
         loginByUsername(userInfo.username, userInfo.password, userInfo.code, userInfo.randomStr).then(data => {
           setToken(data.access_token);
+
           commit('SET_ACCESS_TOKEN', data.access_token);
           commit('SET_REFRESH_TOKEN', data.refresh_token);
 
@@ -70,6 +71,26 @@ const user = {
         }).catch(error => {
           reject(error)
         })
+      })
+    },
+    /**
+     * 退出系统
+     * @param commit
+     * @param state
+     * @returns {Promise}
+     * @constructor
+     */
+    LogOut({ commit, state }) {
+      return new Promise((resolve, reject) => {
+        commit('SET_ACCESS_TOKEN', '')
+        commit('SET_REFRESH_TOKEN', '')
+        commit('SET_USER_INFO', {})
+        commit('SET_ROLES', [])
+        commit('SET_MENU', [])
+        commit('SET_PERMISSIONS', [])
+
+        removeToken()
+        resolve()
       })
     }
   },

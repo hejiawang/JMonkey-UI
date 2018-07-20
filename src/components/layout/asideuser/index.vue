@@ -16,7 +16,7 @@
     <el-dropdown-menu style="width: 100px;" slot="dropdown">
       <el-dropdown-item>个人信息</el-dropdown-item>
       <el-dropdown-item>修改密码</el-dropdown-item>
-      <el-dropdown-item divided>退出登录</el-dropdown-item>
+      <el-dropdown-item @click.native="logout" divided>退出登录</el-dropdown-item>
     </el-dropdown-menu>
   </el-dropdown>
 </template>
@@ -30,6 +30,19 @@
       ...mapGetters(["website"]),
       ...mapGetters(["userInfo"]),
     },
+    methods: {
+      logout() {
+        this.$confirm("此操作将退出系统, 是否继续?", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(() => {
+          store.dispatch("LogOut").then(() => {
+            this.$router.push({ path: "/login" });
+          });
+        });
+      }
+    }
   }
 </script>
 <style lang="scss">
