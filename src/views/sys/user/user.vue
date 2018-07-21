@@ -57,7 +57,7 @@
       <!-- 分页 end -->
 
       <!-- 新增修改用户 start -->
-      <el-dialog :title="textMap[userDialogStatus]" :visible.sync="userDialogFormVisible">
+      <el-dialog :title="textMap[userDialogStatus]" :visible.sync="userDialogFormVisible" @close="cancelUserForm('userForm')" width="800px">
         <el-form :model="userForm" :rules="userRules" ref="userForm" label-width="100px" v-loading="formLoading" element-loading-background="rgba(255, 255, 255, 0.3)">
           <el-row>
             <el-col :span="12">
@@ -166,8 +166,7 @@
   import { list, find, save, modify, del, checkUserName, restPasswsord } from "@/api/sys/user";
   import { listAll, list as roleList } from  "@/api/sys/role";
   import { saveRoles } from  "@/api/sys/userRole";
-  import { validatePhone } from  "@/utils/validate";
-  import {validatenull} from "../../../utils/validate";
+  import { validatePhone, validatenull } from  "@/utils/validate";
 
   export default {
     name: "user",

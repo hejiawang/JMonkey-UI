@@ -55,7 +55,7 @@
       <!-- 树形列表 end -->
 
       <!-- 新增修改菜单 start -->
-      <el-dialog :title="textMap[menuDialogStatus]" :visible.sync="menuDialogFormVisible">
+      <el-dialog :title="textMap[menuDialogStatus]" :visible.sync="menuDialogFormVisible" @close="cancelMenuForm('menuForm')">
 
         <el-form :model="menuForm" :rules="menuRules" ref="menuForm" label-width="100px" v-loading="formLoading" element-loading-background="rgba(255, 255, 255, 0.3)">
           <el-row>

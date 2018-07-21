@@ -50,7 +50,7 @@
       <!-- 分页 end -->
 
       <!-- 新增修改角色 start -->
-      <el-dialog :title="textMap[roleDialogStatus]" :visible.sync="roleDialogFormVisible"  >
+      <el-dialog :title="textMap[roleDialogStatus]" :visible.sync="roleDialogFormVisible" @close="cancelRoleForm('roleForm')" >
         <el-form :model="roleForm" :rules="roleRules" ref="roleForm" label-width="100px" v-loading="formLoading" element-loading-background="rgba(255, 255, 255, 0.3)">
 
           <el-row>
