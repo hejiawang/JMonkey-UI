@@ -1,5 +1,6 @@
 import axios from 'axios'
 import store from '../store'
+import router from '../router'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css'// progress bar style
 import { getToken } from '@/utils/auth'
@@ -39,6 +40,12 @@ axios.interceptors.response.use(data => {
     message: errorCode[code] || errorCode['default'],
     type: 'error'
   })
+
+  if( code == '401' || code == '403' ){
+    store.dispatch("LogOut").then(() => {
+      router.push({ path: "/login" });
+    });
+  }
 
   return Promise.reject(new Error(error));
 })
