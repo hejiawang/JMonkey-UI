@@ -33,6 +33,12 @@ router.beforeEach((to, from, next) => {
 });
 
 router.afterEach((to, from) => {
+  if( to.name=="首页" ){
+    store.commit('SET_CRUMB',  [to.name]);
+    NProgress.done();
+    return ;
+  }
+
   let toPath = to.path;
   let treeMenu = store.getters.menu;
   treeMenu.forEach( menu => {

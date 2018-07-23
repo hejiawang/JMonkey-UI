@@ -61,7 +61,9 @@
           <el-row>
             <el-col :span="12">
               <el-form-item label="父级菜单" prop="parentId">
-                <el-input v-model="menuForm.parentName" placeholder="请输入父级菜单" @focus="handleMenuTree()" readonly/>
+                <el-input v-model="menuForm.parentName" placeholder="请输入父级菜单" @focus="handleMenuTree()" readonly>
+                  <i slot="suffix" class="el-input__icon el-icon-close" @click="restParentMenu"></i>
+                </el-input>
                 <el-input v-model="menuForm.parentId" type="hidden" style="display: none"/>
               </el-form-item>
             </el-col>
@@ -424,6 +426,13 @@
         else modify({id: row.id, sort: row.sort}).then(() => { this.menuTreeList(); });
 
         row.sortEdit = false;
+      },
+      /**
+       * 重置父级菜单
+       */
+      restParentMenu(){
+        this.menuForm.parentName = '';
+        this.menuForm.parentId = '';
       }
     }
   };
