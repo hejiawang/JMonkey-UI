@@ -13,8 +13,8 @@
 
         <el-table-column prop="photo" label="用户头像" show-overflow-tooltip >
           <template slot-scope="scope">
-            <img v-if="scope.row.photo" class="userPhoto" :src="website.filePath + scope.row.photo">
-            <img v-else class="userPhoto" src="../../../assets/img/userDefaule.png">
+            <img v-if="scope.row.photo" class="userPhoto" :src="website.filePath + scope.row.photo" preview="0" :preview-text="scope.row.realName">
+            <img v-else class="userPhoto" src="../../../assets/img/userDefaule.png" preview="0" :preview-text="scope.row.realName">
           </template>
         </el-table-column>
         <el-table-column prop="username" label="用户名称" show-overflow-tooltip/>
