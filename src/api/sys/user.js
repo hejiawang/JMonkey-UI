@@ -14,6 +14,16 @@ export function list( query ) {
 }
 
 /**
+ * 获取所有用户
+ */
+export function listAll() {
+  return request({
+    url: '/upms/user/listAll',
+    method: 'get'
+  })
+}
+
+/**
  * 获取用户信息
  * @param id 用户ID
  */

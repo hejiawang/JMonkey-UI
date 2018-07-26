@@ -5,6 +5,8 @@
       <!-- 功能按钮 start -->
       <el-row class="main-top-group">
         <el-button v-if="sys_user_save" v-waves type="primary" @click="handleCreateUser">新增用户</el-button>
+        <el-button v-waves type="success">导 入</el-button>
+        <el-button v-if="sys_user_export" v-waves type="warning" @click="handleExportUser" :loading="exportLoading">导 出</el-button>
       </el-row>
       <!-- 功能按钮 end -->
 
@@ -163,10 +165,11 @@
 </template>
 <script>
   import { mapGetters } from "vuex";
-  import { list, find, save, modify, del, checkUserName, restPasswsord } from "@/api/sys/user";
+  import { list, find, save, modify, del, checkUserName, restPasswsord, listAll as listAllUser } from "@/api/sys/user";
   import { listAll, list as roleList } from  "@/api/sys/role";
   import { saveRoles } from  "@/api/sys/userRole";
   import { validatePhone, validatenull } from  "@/utils/validate";
+  import { parseTime } from "@/filters";
 
   export default {
     name: "user",
@@ -201,6 +204,7 @@
       };
 
       return {
+        exportLoading: false, //是否导出用户信息
         isSubmit: false,  //是否在提交数据
         formLoading: false, //新增修改用户表单是否正在提交
         listLoading: false,  //页面是否在加载
@@ -285,6 +289,7 @@
         this.sys_user_delete = this.permissions["sys_user_delete"];
         this.sys_user_restPasswsord = this.permissions["sys_user_restPasswsord"];
         this.sys_user_role = this.permissions["sys_user_role"];
+        this.sys_user_export = this.permissions["sys_user_export"];
       },
       /**
        * 用户列表数据
@@ -535,6 +540,44 @@
           this.userPhotoPath = this.website.filePath + data.result;
           this.userForm.photo = data.result;
         }
+      },
+      /**
+       * 导出用户信息
+       */
+      handleExportUser(){
+        this.exportLoading = true;
+        listAllUser().then(( data ) => {
+          import('@/vendor/Export2Excel').then(excel => {
+            const tHeader = ['用户名称', '真实姓名', '用户角色', '手机号码', '用户性别', '出生日期'];
+            const filterVal = [ 'username', 'realName', 'roleList', 'phone', 'sex', 'birthday' ];
+            const jsonData = this.formatUserJson(filterVal, data.result);
+            excel.export_json_to_excel({ header: tHeader, data: jsonData, filename: "用户信息" });
+
+            this.exportLoading = false;
+          })
+        });
+      },
+      /**
+       * 格式化导出的用户信息
+       * @param filterVal
+       * @param jsonData
+       * @returns user json info
+       */
+      formatUserJson( filterVal, jsonData ){
+        return jsonData.map(v => filterVal.map(j => {
+          if (j === 'roleList') {
+            let roleName = "";
+            v[j].forEach(role => { roleName = roleName + role.name + ","; })
+            return roleName
+          } else if( j === 'sex' ){
+            const valMap = {  Man: "男", Woman: "女",  Other: "其他" };
+            return valMap[ v[j] ];
+          } else if ( j === 'birthday' ){
+            return parseTime( v[j], '{y}-{m}-{d}' );
+          } else {
+            return v[j]
+          }
+        }))
       }
     }
   };
