@@ -5,7 +5,7 @@
       <!-- 功能按钮 start -->
       <el-row class="main-top-group">
         <el-button v-if="sys_user_save" v-waves type="primary" @click="handleCreateUser">新增用户</el-button>
-        <el-button v-waves type="success">导 入</el-button>
+        <el-button v-waves type="success" @click="handleImportUser">导 入</el-button>
         <el-button v-if="sys_user_export" v-waves type="warning" @click="handleExportUser" :loading="exportLoading">导 出</el-button>
       </el-row>
       <!-- 功能按钮 end -->
@@ -542,6 +542,12 @@
         }
       },
       /**
+       * 导入用户信息
+       */
+      handleImportUser(){
+
+      },
+      /**
        * 导出用户信息
        */
       handleExportUser(){
@@ -581,8 +587,6 @@
       }
     }
   };
-
-
 </script>
 <style lang="scss">
   .userPhoto {
