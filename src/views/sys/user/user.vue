@@ -139,7 +139,7 @@
       <!-- 新增修改用户 end -->
 
       <!-- 分配角色 start -->
-      <el-dialog title="分配角色" :visible="roleDialogVisible" @open="roleDialogOpen">
+      <el-dialog title="分配角色" :visible="roleDialogVisible" @open="roleDialogOpen" @close="cancelRoleDialog()">
 
         <el-table :data="roleTableData" ref="roleTable" height="300px" tooltip-effect="dark" v-loading="roleListLoading" @selection-change="handleRoleSelect">
           <el-table-column type="selection" width="50"/>
@@ -160,6 +160,26 @@
         </div>
       </el-dialog>
       <!-- 分配角色 end -->
+
+      <!-- 导入用户 start -->
+      <el-dialog title="导入用户" :visible="importUserDialogVisible" @close="cancelImportUserDialog()">
+
+        <el-upload ref="importUserUpload" drag :auto-upload="false"
+            action="/upms/user/importUser" :file-list="importUserFileList" :on-success="importUserSuccess"
+            :on-progress="importUserProgress"
+            class="import_user_upload">
+          <i class="el-icon-upload"></i>
+          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+        </el-upload>
+
+        <div slot="footer" class="dialog-footer">
+          <el-tag type="warning" style="float: left">只能上传与模板一致的Excel文件，且不得超过2M</el-tag>
+          <el-button v-waves @click="cancelImportUserDialog()">取 消</el-button>
+          <el-button v-waves type="success" plain @click="importUserDemo()">下载模板</el-button>
+          <el-button v-waves type="primary" @click="importUser()">确 定</el-button>
+        </div>
+      </el-dialog>
+      <!-- 导入用户 end -->
     </div>
   </el-container>
 </template>
@@ -204,6 +224,8 @@
       };
 
       return {
+        importUserFileList: [],
+        importUserDialogVisible: false, //导入用户的dialog
         exportLoading: false, //是否导出用户信息
         isSubmit: false,  //是否在提交数据
         formLoading: false, //新增修改用户表单是否正在提交
@@ -545,7 +567,40 @@
        * 导入用户信息
        */
       handleImportUser(){
-
+        this.importUserFileList = [];
+        this.importUserDialogVisible = true;
+      },
+      /**
+       * 关闭导入用户信息dialog
+       */
+      cancelImportUserDialog(){
+        this.importUserFileList = [];
+        this.importUserDialogVisible = false;
+      },
+      /**
+       * 下载导入用户的excel模板
+       */
+      importUserDemo(){
+        import('@/vendor/Export2Excel').then(excel => {
+          const tHeader = ['用户名称', '真实姓名', '用户角色', '手机号码', '用户性别', '出生日期'];
+          const jsonData = [['username', '张三', '普通用户', '13888888888', '其他', '1970-01-01']];
+          excel.export_json_to_excel({ header: tHeader, data: jsonData, filename: "用户信息模板" });
+        })
+      },
+      /**
+       * 导入用户信息
+       */
+      importUser(){
+        this.$refs.importUserUpload.submit();
+      },
+      /**
+       * 导入用户信息成功后的回调函数
+       */
+      importUserSuccess( response, file, fileList ){
+        console.info(this.importUserFileList.length);
+      },
+      importUserProgress(event, file, fileList){
+        console.info(file);
       },
       /**
        * 导出用户信息
@@ -618,5 +673,14 @@
     width: 193px;
     height: 193px;
     display: block;
+  }
+
+  .import_user_upload {
+    .el-upload {
+      width: 100%;
+    }
+    .el-upload-dragger {
+       width: 100%;
+     }
   }
 </style>

@@ -2,6 +2,7 @@
   <el-aside width="200px">
     <aside-user></aside-user>
 
+    <!-- 最多支持两级菜单 -->
     <el-menu default-active="/home" background-color="#00142a" text-color="#fff" active-text-color="#409eff" unique-opened collapse-transition router>
       <el-menu-item  index="/home">
         <i class="icon iconfont icon-main"></i>
@@ -24,8 +25,8 @@
           </el-menu-item-group>
         </el-submenu>
       </template>
-
     </el-menu>
+
   </el-aside>
 </template>
 
