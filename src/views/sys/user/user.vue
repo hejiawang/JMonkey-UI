@@ -676,14 +676,14 @@
   .avatar-uploader-icon {
     font-size: 28px;
     color: #8c939d;
-    width: 193px;
-    height: 193px;
-    line-height: 193px;
+    width: 240px;
+    height: 195px;
+    line-height: 195px;
     text-align: center;
   }
   .avatar {
-    width: 193px;
-    height: 193px;
+    width: 240px;
+    height: 195px;
     display: block;
   }
 
