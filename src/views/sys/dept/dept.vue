@@ -157,11 +157,15 @@
         this.$refs["deptForm"].validate(valid => {
           if (valid) {
             this.formLoading = true;
-            save(this.deptForm).then(() => {
-              this.initDeptTree();
-              this.cancelDeptForm();
+            save(this.deptForm).then(( data ) => {
+              if( data.isSuccess ){
+                this.initDeptTree();
+                this.cancelDeptForm();
 
-              this.$notify({ title: "成功", message: "创建成功", type: "success", duration: 2000 });
+                this.$notify({ title: "成功", message: "创建成功", type: "success", duration: 2000 });
+              } else {
+                this.handleErrorCallback(data.message);
+              }
             });
           } else {
             this.isSubmit = false;
@@ -191,11 +195,15 @@
         this.$refs["deptForm"].validate(valid => {
           if (valid) {
             this.formLoading = true;
-            modify(this.deptForm).then(() => {
-              this.initDeptTree();
-              this.cancelDeptForm();
+            modify(this.deptForm).then(( data ) => {
+              if( data.isSuccess ){
+                this.initDeptTree();
+                this.cancelDeptForm();
 
-              this.$notify({ title: "成功", message: "修改成功", type: "success", duration: 2000 });
+                this.$notify({ title: "成功", message: "修改成功", type: "success", duration: 2000 });
+              } else {
+                this.handleErrorCallback(data.message);
+              }
             });
           } else {
             this.isSubmit = false;
@@ -215,6 +223,10 @@
             this.deptForm.parentName = " ";
           }
         });
+      },
+      handleErrorCallback( message ){
+        this.formLoading = false, this.isSubmit = false;
+        this.$notify({ title: "失败", message: message, type: "error", duration: 2000 });
       },
       /**
        * 取消新增或修改操作

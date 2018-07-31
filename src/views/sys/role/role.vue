@@ -283,10 +283,14 @@
         this.$refs[formName].validate(valid => {
           if (valid) {
             this.formLoading = true;
-            save(this.roleForm).then(() => {
-              this.cancelRoleForm(formName);
-              this.roleList();
-              this.$notify({ title: "成功", message: "创建成功", type: "success", duration: 2000 });
+            save(this.roleForm).then(( data ) => {
+              if( data.isSuccess ){
+                this.cancelRoleForm(formName);
+                this.roleList();
+                this.$notify({ title: "成功", message: "创建成功", type: "success", duration: 2000 });
+              } else {
+                this.handleErrorCallback(data.message);
+              }
             });
           } else {
             this.isSubmit = false;
@@ -316,15 +320,23 @@
         this.$refs[formName].validate(valid => {
           if (valid) {
             this.formLoading = true;
-            modify(this.roleForm).then(() => {
-              this.cancelRoleForm(formName);
-              this.roleList();
-              this.$notify({ title: "成功", message: "修改成功", type: "success", duration: 2000 });
+            modify(this.roleForm).then(( data ) => {
+              if( data.isSuccess ){
+                this.cancelRoleForm(formName);
+                this.roleList();
+                this.$notify({ title: "成功", message: "修改成功", type: "success", duration: 2000 });
+              } else {
+                this.handleErrorCallback(data.message);
+              }
             });
           } else {
             this.isSubmit = false;
           }
         })
+      },
+      handleErrorCallback( message ){
+        this.formLoading = false, this.isSubmit = false;
+        this.$notify({ title: "失败", message: message, type: "error", duration: 2000 });
       },
       /**
        * role dialog

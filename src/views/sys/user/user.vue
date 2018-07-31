@@ -406,10 +406,14 @@
         this.$refs[formName].validate(valid => {
           if (valid) {
             this.formLoading = true;
-            modify(this.userForm).then(() => {
-              this.cancelUserForm(formName);
-              this.userList();
-              this.$notify({ title: "成功", message: "修改成功", type: "success", duration: 2000 });
+            modify(this.userForm).then(( data ) => {
+              if( data.isSuccess ){
+                this.cancelUserForm(formName);
+                this.userList();
+                this.$notify({ title: "成功", message: "修改成功", type: "success", duration: 2000 });
+              } else {
+                this.handleErrorCallback(data.message);
+              }
             });
           } else {
             this.isSubmit = true;
@@ -433,15 +437,23 @@
         this.$refs[formName].validate(valid => {
           if (valid) {
             this.formLoading = true;
-            save(this.userForm).then(() => {
-              this.cancelUserForm(formName);
-              this.userList();
-              this.$notify({ title: "成功", message: "创建成功", type: "success", duration: 2000 });
+            save(this.userForm).then(( data ) => {
+              if( data.isSuccess ){
+                this.cancelUserForm(formName);
+                this.userList();
+                this.$notify({ title: "成功", message: "创建成功", type: "success", duration: 2000 });
+              } else {
+                this.handleErrorCallback(data.message);
+              }
             });
           } else {
             this.isSubmit = false;
           }
         })
+      },
+      handleErrorCallback( message ){
+        this.formLoading = false, this.isSubmit = false;
+        this.$notify({ title: "失败", message: message, type: "error", duration: 2000 });
       },
       /**
        * 关闭user dialog

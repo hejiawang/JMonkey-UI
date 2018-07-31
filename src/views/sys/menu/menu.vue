@@ -283,10 +283,14 @@
         this.$refs[formName].validate(valid => {
           if (valid) {
             this.formLoading = true;
-            save(this.menuForm).then(() => {
-              this.cancelMenuForm(formName);
-              this.menuTreeList();
-              this.$notify({ title: "成功", message: "创建成功", type: "success", duration: 2000 });
+            save(this.menuForm).then(( data ) => {
+              if( data.isSuccess ){
+                this.cancelMenuForm(formName);
+                this.menuTreeList();
+                this.$notify({ title: "成功", message: "创建成功", type: "success", duration: 2000 });
+              } else {
+                this.handleErrorCallback(data.message);
+              }
             });
           } else {
             this.isSubmit = false;
@@ -316,10 +320,14 @@
         this.$refs[formName].validate(valid => {
           if (valid) {
             this.formLoading = true;
-            modify(this.menuForm).then(() => {
-              this.cancelMenuForm(formName);
-              this.menuTreeList();
-              this.$notify({ title: "成功", message: "修改成功", type: "success", duration: 2000 });
+            modify(this.menuForm).then(( data ) => {
+              if( data.isSuccess ){
+                this.cancelMenuForm(formName);
+                this.menuTreeList();
+                this.$notify({ title: "成功", message: "修改成功", type: "success", duration: 2000 });
+              } else {
+                this.handleErrorCallback(data.message);
+              }
             });
           } else {
             this.isSubmit = true;
@@ -334,6 +342,10 @@
         this.handleCreateMenu();
         this.menuForm.parentId = row.id;
         this.menuForm.parentName = row.name;
+      },
+      handleErrorCallback( message ){
+        this.formLoading = false, this.isSubmit = false;
+        this.$notify({ title: "失败", message: message, type: "error", duration: 2000 });
       },
       /**
        * 关闭menu dialog
