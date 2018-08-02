@@ -1,6 +1,7 @@
 <template>
   <el-container>
-    <div class="main-container">
+
+    <div class="main-container" :style="dictTypeStyle">
 
       <!-- 功能按钮 start -->
       <el-row class="main-top-group">
@@ -21,7 +22,37 @@
         </el-table-column>
       </el-table>
       <!-- 字典类型列表 end -->
+
+      <!-- 分页 start -->
+      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="listQuery.current" :page-sizes="[10,20,30,50]" :page-size="listQuery.size" layout="total, sizes, prev, pager, next, jumper" :total="listTotal" />
+      <!-- 分页 end -->
+
+      <!-- 新增修改字典类型 start -->
+      <el-dialog :title="textMap[dictDialogStatus]" :visible.sync="dictTypeDialogFormVisible" @close="cancelDictTypeForm()" >
+
+        <el-form :model="dictTypeForm" :rules="dictTypeRules" ref="dictTypeForm" label-width="100px" v-loading="formLoading" element-loading-background="rgba(255, 255, 255, 0.3)">
+          <el-form-item label="字典类型" prop="remark">
+            <el-input v-model="dictTypeForm.type" placeholder="请输入字典类型" maxlength="20"/>
+          </el-form-item>
+          <el-form-item label="类型描述" prop="remark">
+            <el-input v-model="dictTypeForm.remark" type="textarea" :rows="2" maxlength="100"/>
+          </el-form-item>
+        </el-form>
+
+        <div slot="footer" class="dialog-footer">
+          <el-button v-waves @click="cancelDictTypeForm()">取 消</el-button>
+          <el-button v-waves :disabled="isSubmit" type="primary" v-if=" dictDialogStatus == 'createDictType' " @click="createDictType">确 定</el-button>
+          <el-button v-waves :disabled="isSubmit" type="primary" v-if=" dictDialogStatus == 'modifyDictType' " @click="modifyDictType">修 改</el-button>
+        </div>
+      </el-dialog>
+      <!-- 新增修改字典类型 end -->
+
     </div>
+
+    <div class="main-container" :style="dictValueStyle">
+
+    </div>
+
   </el-container>
 </template>
 <script>
@@ -32,9 +63,48 @@
   export default {
     name: "dict",
     data () {
+      var validType = ( rule, value, callback ) => {
+        var id = this.roleForm.id ? this.roleForm.id : null;
+        checkExistType( id, value ).then(data => {
+          if( data.result ) callback(new Error('字典类型已存在'))
+          else callback()
+        });
+      };
+
       return {
+        isSubmit: false,  //是否在提交数据
+        formLoading: false, //表单是否正在提交
+        dictTypeDialogFormVisible: false, //字典类型dialog是否显示
         dictTypeTableLoading: false,  //字典类型列表是否正在加载
         dictTypeTableData: null,  //字典类型列表数据
+        listTotal: null,  //字典类型列表总条数
+        listQuery: {  //字典类型列表分页条件
+          current: 1,
+          size: 10
+        },
+        dictDialogStatus: "", //dialog状态值
+        textMap: {  //显示文字
+          createDictType: "新增字典类型",
+          modifyDictType: "修改字典类型",
+          createDictValue: "新增字典值",
+          modifyDictValue: "修改字典值"
+        },
+        dictTypeForm: {
+          type: "",
+          remark: ""
+        },
+        dictTypeRules: {
+          name: [
+            { required: true, message: "请输入字典类型", trigger: "blur" },
+            { min: 1, max: 20, message: "长度在 1 到 20 个字符", trigger: "blur" },
+            { validator: validType, trigger: 'blur' }
+          ],
+          remark: [
+            { max: 100, message: "长度在 1 到 100 个字符", trigger: "blur" }
+          ]
+        },
+        dictTypeStyle: "width: 100%",
+        dictValueStyle: "display: none;",
       }
     },
     computed: {
@@ -42,6 +112,7 @@
     },
     created() {
       this.initPermissions();
+      this.initDictTypeList();
     },
     methods: {
       /**
@@ -56,17 +127,139 @@
         this.sys_dict_value_modify = this.permissions["sys_dict_value_modify"];
         this.sys_dict_value_delete = this.permissions["sys_dict_value_delete"];
       },
+      /**
+       * 字典类型分页列表
+       */
+      initDictTypeList(){
+        this.listLoading = true;
+        listType(this.listQuery).then(data => {
+          this.listTotal = data.total;
+          this.roleTableData = data.rows;
+
+          this.listLoading = false;
+        });
+      },
+      /**
+       * 新增字典类型dialog
+       */
       handleCreateDictType(){
-
+        this.restDictTypeForm();
+        this.dictDialogStatus = "createDictType";
+        this.dictTypeDialogFormVisible = true;
       },
+      /**
+       * 新增字典类型
+       */
+      createDictType(){
+        this.isSubmit = true;
+        this.$refs.dictTypeForm.validate(valid => {
+          if (valid) {
+            this.formLoading = true;
+            saveType(this.dictTypeForm).then(( data ) => {
+              if( data.isSuccess ){
+                this.cancelDictTypeForm();
+                this.initDictTypeList();
+                this.$notify({ title: "成功", message: "创建成功", type: "success", duration: 2000 });
+              } else {
+                this.handleErrorCallback(data.message);
+              }
+            });
+          } else {
+            this.isSubmit = false;
+          }
+        })
+      },
+      /**
+       * 修改字典类型dialog
+       */
       handleModifyDictType( row ){
+        findType( row.id ).then( data => {
+          this.dictTypeForm = data.result;
 
+          this.dictDialogStatus = "modifyDictType";
+          this.dictTypeDialogFormVisible = true;
+        });
       },
+      /**
+       * 修改字典类型
+       */
+      modifyDictType(){
+        this.isSubmit = true;
+        this.$refs.dictTypeForm.validate(valid => {
+          if (valid) {
+            this.formLoading = true;
+            modifyType(this.dictTypeForm).then(( data ) => {
+              if( data.isSuccess ){
+                this.cancelDictTypeForm(formName);
+                this.initDictTypeList();
+                this.$notify({ title: "成功", message: "修改成功", type: "success", duration: 2000 });
+              } else {
+                this.handleErrorCallback(data.message);
+              }
+            });
+          } else {
+            this.isSubmit = false;
+          }
+        })
+      },
+      /**
+       * 关闭字典类型dialog
+       */
+      cancelDictTypeForm(){
+        this.dictTypeDialogFormVisible = false;
+        this.formLoading = false;
+        this.isSubmit = false;
+        this.restDictTypeForm();
+        this.$refs.dictTypeForm.resetFields();
+      },
+      /**
+       * 重置字典类型form值
+       */
+      restDictTypeForm(){
+        this.dictTypeForm = {
+          type: "",
+          remark: ""
+        }
+      },
+      /**
+       * 错误操作回调
+       */
+      handleErrorCallback( message ){
+        this.formLoading = false, this.isSubmit = false;
+        this.$notify({ title: "失败", message: message, type: "error", duration: 2000 });
+      },
+      /**
+       * 删除字典类型
+       */
       deleteDictType( row ){
-
+        this.$confirm( "此操作将永久删除该类型(字典类型:" + row.type + "), 是否继续?", "提示",
+          { confirmButtonText: "确定", cancelButtonText: "取消", type: "warning" }
+        ).then(() => {
+          delType(row.id).then(( result ) => {
+            this.initDictTypeList();
+            this.$notify({ title: "成功", message: "删除成功", type: "success", duration: 2000 });
+          });
+        });
       },
+      /**
+       * 展现字典类型的值
+       */
       handleDictTypeValue( row ){
 
+      },
+      /**
+       * 分页插件——每页数量变化
+       */
+      handleSizeChange(val){
+        this.listQuery.size = val;
+        this.initDictTypeList();
+      },
+      /**
+       * 分页插件——当前页变化
+       */
+      handleCurrentChange(val){
+        this.listQuery.current = val;
+        this.initDictTypeList();
       }
     }
   }
