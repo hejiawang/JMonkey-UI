@@ -49,9 +49,22 @@ $aside-width: 200px;
           .el-input-group__prepend {
             background-color: #fff !important;
           }
+          .search-close {
+            margin-right: 60px;
+          }
         }
       }
     }
+  }
+}
+
+.main-search-div {
+  float: right;
+  .el-input__inner {
+    width: 150px;
+  }
+  .el-form-item{
+    margin-bottom: 0px;
   }
 }
 

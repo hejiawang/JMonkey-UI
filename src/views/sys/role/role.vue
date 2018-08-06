@@ -9,7 +9,7 @@
         <el-button v-if="sys_role_save" v-waves type="primary" @click="handleCreateRole">新增角色</el-button>
 
         <el-input placeholder="请输入查询内容" v-model="search.value"  class="main-search">
-          <i slot="suffix" class="el-input__icon el-icon-close" @click="restSearch"></i>
+          <i slot="suffix" class="el-input__icon el-icon-close search-close" @click="restSearch"></i>
           <el-select v-model="search.key" slot="prepend" placeholder="请选择">
             <el-option label="角色名称" value="name"></el-option>
             <el-option label="角色编码" value="code"></el-option>

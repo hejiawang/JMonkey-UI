@@ -7,6 +7,31 @@
         <el-button v-if="sys_user_save" v-waves type="primary" @click="handleCreateUser">新增用户</el-button>
         <el-button v-waves type="success" @click="handleImportUser">导 入</el-button>
         <el-button v-if="sys_user_export" v-waves type="warning" @click="handleExportUser" :loading="exportLoading">导 出</el-button>
+
+        <div class="main-search-div">
+          <el-form :inline="true" :model="searchForm">
+            <el-form-item label="用户名称">
+              <el-input v-model="searchForm.username" placeholder="请输入用户名称"></el-input>
+            </el-form-item>
+
+            <el-form-item label="用户角色">
+              <el-select v-model="searchForm.roleId" placeholder="请选择用户角色">
+                <el-option v-for="item in roleSelectListData" :key="item.id" :label="item.name" :value="item.id" />
+              </el-select>
+            </el-form-item>
+
+            <el-form-item label="归属部门">
+              <el-input v-model="searchForm.deptName" placeholder="请选择归属部门" readonly></el-input>
+            </el-form-item>
+
+            <el-button-group>
+              <el-button icon="el-icon-search" v-waves  @click="searchUser()"/>
+              <el-button icon="el-icon-delete" v-waves @click="restSearchUser()"/>
+            </el-button-group>
+
+          </el-form>
+
+        </div>
       </el-row>
       <!-- 功能按钮 end -->
 
@@ -309,6 +334,12 @@
           children: "children",
           label: "name"
         },
+        searchForm: {
+          username: "",
+          roleId: "",
+          deptName: "",
+          deptId: ""
+        }
       }
     },
     filters:{
@@ -727,6 +758,24 @@
         });
 
         this.cancelDeptDialog();
+      },
+      /**
+       * 用户查询
+       */
+      searchUser(){
+        var searchParam = ['username', 'roleId', 'deptId'];
+        searchParam.forEach( param => this.listQuery[param] = this.searchForm[param] );
+
+        this.userList();
+      },
+      /**
+       * 重置查询条件
+       */
+      restSearchUser(){
+        var searchParam = ['username', 'roleId', 'deptId', 'deptName'];
+        searchParam.forEach( param => this.searchForm[param] = "" );
+
+        this.searchUser();
       }
     }
   };
