@@ -455,4 +455,9 @@
     height: 400px;
     overflow-y: scroll;
   }
+
+  .el-table__body-wrapper {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
 </style>

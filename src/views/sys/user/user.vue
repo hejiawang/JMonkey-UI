@@ -26,6 +26,11 @@
             <span><template v-for="roleInfo in scope.row.roleList"> {{roleInfo.name}}, </template></span>
           </template>
         </el-table-column>
+        <el-table-column prop="deptList" label="归属部门" show-overflow-tooltip>
+          <template slot-scope="scope">
+            <span><template v-for="dept in scope.row.deptList"> {{dept.name}}, </template></span>
+          </template>
+        </el-table-column>
         <el-table-column prop="phone" label="手机号码" show-overflow-tooltip/>
         <el-table-column prop="sex" label="用户性别" show-overflow-tooltip>
           <template slot-scope="scope">

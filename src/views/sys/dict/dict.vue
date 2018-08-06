@@ -31,7 +31,7 @@
       <el-dialog :title="textMap[dictDialogStatus]" :visible.sync="dictTypeDialogFormVisible" @close="cancelDictTypeForm()" >
 
         <el-form :model="dictTypeForm" :rules="dictTypeRules" ref="dictTypeForm" label-width="100px" v-loading="formLoading" element-loading-background="rgba(255, 255, 255, 0.3)">
-          <el-form-item label="字典类型" prop="remark">
+          <el-form-item label="字典类型" prop="type">
             <el-input v-model="dictTypeForm.type" placeholder="请输入字典类型" maxlength="20"/>
           </el-form-item>
           <el-form-item label="类型描述" prop="remark">
@@ -60,7 +60,7 @@
           <el-table-column prop="lable" label="字典标签" show-overflow-tooltip/>
           <el-table-column prop="value" label="字典键值" show-overflow-tooltip/>
           <el-table-column prop="sort" label="字典排序" show-overflow-tooltip/>
-          <el-table-column fixed="right" label="操作" width="300" align="center">
+          <el-table-column fixed="right" label="操作" width="150" align="center">
             <template slot-scope="scope">
               <el-button v-if="sys_dict_value_modify" size="mini" type="success" v-waves @click="handleModifyDictValue(scope.row)">编辑</el-button>
               <el-button v-if="sys_dict_value_delete" size="mini" type="danger" v-waves @click="deleteDictValue(scope.row)">删除</el-button>
@@ -98,12 +98,13 @@
   import { mapGetters } from "vuex";
   import { list as listType, find as findType, save as saveType, modify as modifyType, del as delType, checkExist as checkExistType } from "@/api/sys/dictType";
   import { list as listValue, find as findValue, save as saveValue, modify as modifyValue, del as delValue } from "@/api/sys/dictValue";
+  import { validatenull } from  "@/utils/validate";
 
   export default {
     name: "dict",
     data () {
       var validType = ( rule, value, callback ) => {
-        var id = this.roleForm.id ? this.roleForm.id : null;
+        var id = this.dictTypeForm.id ? this.dictTypeForm.id : null;
         checkExistType( id, value ).then(data => {
           if( data.result ) callback(new Error('字典类型已存在'))
           else callback()
@@ -133,7 +134,7 @@
           remark: ""
         },
         dictTypeRules: {
-          name: [
+          type: [
             { required: true, message: "请输入字典类型", trigger: "blur" },
             { min: 1, max: 20, message: "长度在 1 到 20 个字符", trigger: "blur" },
             { validator: validType, trigger: 'blur' }
@@ -186,7 +187,7 @@
         this.dictTypeTableLoading = true;
         listType(this.listQuery).then(data => {
           this.listTotal = data.total;
-          this.roleTableData = data.rows;
+          this.dictTypeTableData = data.rows;
 
           this.dictTypeTableLoading = false;
         });
@@ -334,11 +335,13 @@
        * 关闭字典类型的值tag
        */
       closeDictTypeValue(){
-        this.dictTypeStyle = "animation:dictTypeHidden 1s;-webkit-animation:dictTypeHidden 1s; width: 100%";
-        this.dictValueStyle = "animation:dictValueHidden 1s;-webkit-animation:dictValueHidden 1s; display: none;";
+        if( ! validatenull( this.dictTypeSelect ) ){
+          this.dictTypeStyle = "animation:dictTypeHidden 1s;-webkit-animation:dictTypeHidden 1s; width: 100%";
+          this.dictValueStyle = "animation:dictValueHidden 1s;-webkit-animation:dictValueHidden 1s; display: none;";
 
-        this.dictTypeSelect = null;
-        this.dictValueTableData = null;
+          this.dictTypeSelect = null;
+          this.dictValueTableData = null;
+        }
       },
       /**
        * 新增字典值dialog
@@ -441,20 +444,20 @@
   }
 </script>
 <style lang="scss">
-  @keyframes dictTypeStyle {
+  @keyframes dictTypeShow {
     0%   { width:100%;}
     100% { width:60%;}
   }
-  @-webkit-keyframes dictTypeStyle {
+  @-webkit-keyframes dictTypeShow {
     0%   { width:100%;}
     100% { width:60%;}
   }
 
-  @keyframes dictValueStyle {
+  @keyframes dictValueShow {
     0%   { width:0%;}
     100% { width:40%;}
   }
-  @-webkit-keyframes dictValueStyle {
+  @-webkit-keyframes dictValueShow {
     0%   { width:0%;}
     100% { width:40%;}
   }
