@@ -133,6 +133,10 @@
               <el-option v-for="item in roleSelectListData" :key="item.id" :label="item.name" :value="item.id" />
             </el-select>
           </el-form-item>
+          <el-form-item label="归属部门" prop=" deptIdList">
+            <el-input v-model="userForm.deptNameList" placeholder="请选择归属部门" @focus="handleDeptTree()" readonly/>
+          </el-form-item>
+
         </el-form>
 
         <div slot="footer" class="dialog-footer">
@@ -166,6 +170,18 @@
       </el-dialog>
       <!-- 分配角色 end -->
 
+      <!-- 选择归属部门 start -->
+      <el-dialog title="归属部门" :visible.sync="deptDialogTreeVisible" width="500px">
+        <el-tree :data="deptTreeDate" node-key="id" highlight-current :props="deptTreeProps" ref="deptTree" check-strictly show-checkbox default-expand-all>
+        </el-tree>
+
+        <div slot="footer" class="dialog-footer">
+          <el-button v-waves @click="cancelDeptDialog()">取 消</el-button>
+          <el-button v-waves type="primary" @click="handleSelectDept()">确 定</el-button>
+        </div>
+      </el-dialog>
+      <!-- 选择归属部门 end -->
+
       <!-- 导入用户 start -->
       <el-dialog title="导入用户" :visible="importUserDialogVisible" @close="cancelImportUserDialog()">
 
@@ -193,6 +209,7 @@
   import { list, find, save, modify, del, checkUserName, restPasswsord, listAll as listAllUser } from "@/api/sys/user";
   import { listAll, list as roleList } from  "@/api/sys/role";
   import { saveRoles } from  "@/api/sys/userRole";
+  import { treeList as deptTreeList } from "@/api/sys/dept";
   import { validatePhone, validatenull } from  "@/utils/validate";
   import { parseTime } from "@/filters";
 
@@ -264,6 +281,8 @@
           realName: "",
           phone: "",
           roleIdList: [],
+          deptIdList: [],
+          deptNameList: '',
           sex: "Man",
           birthday: "",
           photo: "",
@@ -284,6 +303,12 @@
           realName: { required: true, message: "请输入真实姓名", trigger: "blur" }
         },
         userPhotoPath:"",
+        deptDialogTreeVisible: false,
+        deptTreeDate: [],
+        deptTreeProps: {
+          children: "children",
+          label: "name"
+        },
       }
     },
     filters:{
@@ -305,6 +330,7 @@
       this.userList();
       this.initRoleInfo();
       this.initRoleList();
+      this.initDeptTreeDate();
     },
     methods: {
       /**
@@ -344,6 +370,14 @@
           this.roleListLoading = false;
 
           if(this.roleDialogVisible) this.roleDialogOpen();
+        });
+      },
+      /**
+       * 初始化用户归属部门数据
+       */
+      initDeptTreeDate(){
+        deptTreeList().then( data => {
+          this.deptTreeDate = data.result;
         });
       },
       /**
@@ -397,6 +431,11 @@
         find( row.id ).then( data => {
           this.userForm = data.result;
           if( !validatenull(data.result.photo) ) this.userPhotoPath = this.website.filePath + data.result.photo;
+
+          this.userForm.deptNameList = '';
+          data.result.deptList.forEach( dept => {
+            this.userForm.deptNameList = dept.name + ",  " + this.userForm.deptNameList;
+          });
 
           this.userDialogStatus = "modifyUser";
           this.userDialogFormVisible = true;
@@ -481,6 +520,8 @@
           realName: "",
           phone: "",
           roleIdList: [],
+          deptIdList: [],
+          deptNameList: '',
           sex: "Man",
           birthday: "",
           photo: "",
@@ -656,6 +697,36 @@
             return v[j]
           }
         }))
+      },
+      /**
+       * 选择归属部门dialog
+       */
+      handleDeptTree(){
+        this.deptDialogTreeVisible = true;
+
+        this.$nextTick(function () {
+          this.$refs.deptTree.setCheckedKeys(this.userForm.deptIdList);
+        });
+      },
+      /**
+       * 关闭选择归属部门dialog
+       */
+      cancelDeptDialog(){
+        this.$refs.deptTree.setCheckedKeys([]);
+        this.deptDialogTreeVisible = false;
+      },
+      /**
+       * 选择归属部门
+       */
+      handleSelectDept(){
+        this.userForm.deptIdList = [], this.userForm.deptNameList = '';
+
+        this.$refs.deptTree.getCheckedNodes().forEach( dept => {
+          this.userForm.deptNameList = dept.name + ",  " + this.userForm.deptNameList;
+          this.userForm.deptIdList.push(dept.id);
+        });
+
+        this.cancelDeptDialog();
       }
     }
   };
