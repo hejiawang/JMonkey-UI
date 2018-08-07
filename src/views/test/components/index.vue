@@ -1,0 +1,49 @@
+<template>
+  <el-container>
+    <div class="main-container">
+
+      <!-- 字典组件 start -->
+      <el-row class="main-top-group">
+        <el-form :inline="true" :model="dictComponentForm" >
+          <el-form-item label="字典组件">
+            <component-dict dictType="sys_user_sex" v-model="dictComponentForm.dictValue" defaultValue="woman" />
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="handleConsoleDict">查询</el-button>
+          </el-form-item>
+          <el-form-item label="参数说明">
+            dictType：字典类型； defaultValue：默认值；  type：展示方式（radio、select），默认radio；  placeholder：当type为select时的placeholder
+          </el-form-item>
+        </el-form>
+      </el-row>
+      <!-- 字典组件 start -->
+
+    </div>
+  </el-container>
+</template>
+<script>
+  import componentDict from '@/components/dict'
+
+  export default {
+    name: "componentsTest",
+    components: {
+      /* 字典组件 start */
+      componentDict,
+      /* 字典组件 end */
+    },
+    data() {
+      return {
+        /* 字典组件 start */
+        dictComponentForm : { dictValue : "" },
+        /* 字典组件 end */
+      }
+    },
+    methods: {
+      /* 字典组件 start */
+      handleConsoleDict(){
+        console.info( this.dictComponentForm.dictValue )
+      },
+      /* 字典组件 end */
+    }
+  }
+</script>

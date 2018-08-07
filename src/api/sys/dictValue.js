@@ -57,3 +57,14 @@ export function del(id) {
     method: 'delete'
   })
 }
+
+/**
+ * 根据字典类型获取该类型的字典值
+ * @param type 字典类型
+ */
+export function findValue(type) {
+  return request({
+    url: '/upms/dict/value/findValue/' + type,
+    method: 'get'
+  })
+}
