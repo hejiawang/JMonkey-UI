@@ -6,6 +6,15 @@
       <!-- 功能按钮 start -->
       <el-row class="main-top-group">
         <el-button v-if="sys_dict_type_save" v-waves type="primary" @click="handleCreateDictType">新增字典</el-button>
+
+        <el-input placeholder="请输入查询内容" v-model="search.value"  class="main-search" @keyup.enter.native="searchDictType">
+          <i slot="suffix" class="el-input__icon el-icon-close search-close" @click="restSearchDictType"></i>
+          <el-select v-model="search.key" slot="prepend" placeholder="请选择" @change="changeSearch">
+            <el-option label="字典类型" value="type"></el-option>
+            <el-option label="角色描述" value="remark"></el-option>
+          </el-select>
+          <el-button slot="append" icon="el-icon-search" v-waves @click="searchDictType"></el-button>
+        </el-input>
       </el-row>
       <!-- 功能按钮 end -->
 
@@ -50,6 +59,8 @@
     </div>
 
     <div class="main-container" :style="dictValueStyle">
+
+      <!-- 字典类型对应的字典值列表 start -->
       <el-card>
         <div slot="header" class="clearfix">
           <span>字典类型： <el-tag type="info" key="tag" closable @close="closeDictTypeValue()" v-if="dictTypeSelect">{{ dictTypeSelect.type }}</el-tag> </span>
@@ -68,7 +79,9 @@
           </el-table-column>
         </el-table>
       </el-card>
+      <!-- 字典类型对应的字典值列表 end -->
 
+      <!-- 新增修改字典值 start -->
       <el-dialog :title="textMap[dictDialogStatus]" :visible.sync="dictValueDialogFormVisible" @close="cancelDictValueForm()" >
 
         <el-form :model="dictValueForm" :rules="dictValueRules" ref="dictValueForm" label-width="100px" v-loading="formLoading" element-loading-background="rgba(255, 255, 255, 0.3)">
@@ -89,7 +102,7 @@
           <el-button v-waves :disabled="isSubmit" type="primary" v-if=" dictDialogStatus == 'modifyDictValue' " @click="modifyDictValue">修 改</el-button>
         </div>
       </el-dialog>
-
+      <!-- 新增修改字典值 end -->
     </div>
 
   </el-container>
@@ -157,7 +170,11 @@
         dictValueRules: {
           lable: {required: true, message: "请输入字典标签", trigger: "blur"},
           value: {required: true, message: "请输入字典键值", trigger: "blur"}
-        }
+        },
+        search: {
+          key: "type",
+          value: ""
+        },
       }
     },
     computed: {
@@ -440,6 +457,28 @@
           });
         });
       },
+      /**
+       * 字典类型查询
+       */
+      searchDictType(){
+        this.listQuery[this.search.key] = this.search.value;
+        this.initDictTypeList();
+      },
+      /**
+       * 重置字典类型查询条件
+       */
+      restSearchDictType(){
+        this.changeSearch();
+        this.searchDictType();
+      },
+      /**
+       * 查询条件改变的回调函数
+       */
+      changeSearch(){
+        let searchParam = ['type','remark'];
+        searchParam.forEach( param => this.listQuery[param] = '' );
+        this.search.value = "";
+      }
     }
   }
 </script>

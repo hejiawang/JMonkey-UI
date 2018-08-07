@@ -21,7 +21,7 @@
             </el-form-item>
 
             <el-form-item label="归属部门">
-              <el-input v-model="searchForm.deptName" placeholder="请选择归属部门" readonly></el-input>
+              <el-input v-model="searchForm.deptName" placeholder="请选择归属部门" @focus="handleDeptSearch()" readonly></el-input>
             </el-form-item>
 
             <el-button-group>
@@ -159,7 +159,9 @@
             </el-select>
           </el-form-item>
           <el-form-item label="归属部门" prop=" deptIdList">
-            <el-input v-model="userForm.deptNameList" placeholder="请选择归属部门" @focus="handleDeptTree()" readonly/>
+            <el-input v-model="userForm.deptNameList" placeholder="请选择归属部门" @focus="handleDeptTree()" readonly>
+              <i slot="suffix" class="el-input__icon el-icon-close" @click="restUserFormDept()"></i>
+            </el-input>
           </el-form-item>
 
         </el-form>
@@ -196,7 +198,7 @@
       <!-- 分配角色 end -->
 
       <!-- 选择归属部门 start -->
-      <el-dialog title="归属部门" :visible.sync="deptDialogTreeVisible" width="500px">
+      <el-dialog title="归属部门" :visible.sync="deptDialogTreeVisible" width="500px" @close="cancelDeptDialog()">
         <el-tree :data="deptTreeDate" node-key="id" highlight-current :props="deptTreeProps" ref="deptTree" check-strictly show-checkbox default-expand-all>
         </el-tree>
 
@@ -226,6 +228,13 @@
         </div>
       </el-dialog>
       <!-- 导入用户 end -->
+
+      <!-- 查询用户——查询用户归属部门 start -->
+      <el-dialog title="归属部门查询" :visible.sync="deptSearchVisible" width="500px" @close="cancelDeptSearchDialog()">
+        <el-tree :data="deptTreeDate" node-key="id" highlight-current :props="deptTreeProps" ref="deptSearchTree" @node-click="selectSearchDept" default-expand-all>
+        </el-tree>
+      </el-dialog>
+      <!-- 查询用户——查询用户归属部门 end -->
     </div>
   </el-container>
 </template>
@@ -327,19 +336,20 @@
           ],
           realName: { required: true, message: "请输入真实姓名", trigger: "blur" }
         },
-        userPhotoPath:"",
-        deptDialogTreeVisible: false,
-        deptTreeDate: [],
+        userPhotoPath:"", //用户头像路径
+        deptDialogTreeVisible: false, //新增修改用户信息时，是否显示部门tree的dialog
+        deptTreeDate: [], //部门tree的数据
         deptTreeProps: {
           children: "children",
           label: "name"
         },
-        searchForm: {
+        searchForm: { //用户检索from
           username: "",
           roleId: "",
           deptName: "",
           deptId: ""
-        }
+        },
+        deptSearchVisible: false, //是否显示用户查询是的部门tree的dialog
       }
     },
     filters:{
@@ -760,6 +770,12 @@
         this.cancelDeptDialog();
       },
       /**
+       * 清空userfrom中的部门信息
+       */
+      restUserFormDept(){
+        this.userForm.deptIdList = [], this.userForm.deptNameList = '';
+      },
+      /**
        * 用户查询
        */
       searchUser(){
@@ -776,6 +792,26 @@
         searchParam.forEach( param => this.searchForm[param] = "" );
 
         this.searchUser();
+      },
+      /**
+       * 选择用户归属部门的查询条件
+       * @param data
+       */
+      selectSearchDept( data ){
+        this.searchForm.deptId = data.id, this.searchForm.deptName = data.name;
+        this.deptSearchVisible = false;
+      },
+      /**
+       * 关闭查询用户归属部门的dialog
+       */
+      cancelDeptSearchDialog(){
+        this.deptSearchVisible = false;
+      },
+      /**
+       * 显示查询用户归属部门的dialog
+       */
+      handleDeptSearch(){
+        this.deptSearchVisible = true;
       }
     }
   };

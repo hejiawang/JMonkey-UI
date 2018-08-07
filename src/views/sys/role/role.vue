@@ -8,9 +8,9 @@
       <el-row class="main-top-group">
         <el-button v-if="sys_role_save" v-waves type="primary" @click="handleCreateRole">新增角色</el-button>
 
-        <el-input placeholder="请输入查询内容" v-model="search.value"  class="main-search">
+        <el-input placeholder="请输入查询内容" v-model="search.value"  class="main-search" @keyup.enter.native="searchRole">
           <i slot="suffix" class="el-input__icon el-icon-close search-close" @click="restSearch"></i>
-          <el-select v-model="search.key" slot="prepend" placeholder="请选择">
+          <el-select v-model="search.key" slot="prepend" placeholder="请选择" @change="changeSearch">
             <el-option label="角色名称" value="name"></el-option>
             <el-option label="角色编码" value="code"></el-option>
           </el-select>
@@ -249,8 +249,16 @@
        * 重置检索内容
        */
       restSearch(){
-        this.search.value = "";
+        this.changeSearch();
         this.searchRole();
+      },
+      /**
+       * 查询条件改变的回调函数
+       */
+      changeSearch(){
+        let searchParam = ['name','code'];
+        searchParam.forEach( param => this.listQuery[param] = '' );
+        this.search.value = "";
       },
       /**
        * 删除角色
