@@ -84,7 +84,7 @@
     <!-- 角色 curd end -->
 
     <!-- 角色授权 start -->
-    <div class="main-container" :style="authorizeStyle">
+    <div class="main-container sys-role-card" :style="authorizeStyle">
       <el-card>
         <div slot="header" class="clearfix">
           <span>授权角色： <el-tag type="info" key="tag" closable @close="closeAuthorize()" v-if="authorizeRole">{{ authorizeRole.name }}</el-tag> </span>
@@ -444,18 +444,18 @@
     100% { width:0%;}
   }
 
-  .el-card{
+  .sys-role-card .el-card{
     height: 100%;
   }
 
-  .el-card__body{
+  .sys-role-card .el-card__body{
     height: calc(100% - 50px);
   }
 
-  /* .el-tree{
-     height: calc(100% - 60px);
-     overflow-y: scroll;
-   }*/
+  .sys-role-card .el-tree{
+    height: calc(100% - 60px);
+    overflow-y: scroll;
+  }
 
 </style>
 

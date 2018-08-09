@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <div class="main-container">
+    <div class="main-container sys-menu-class">
 
       <!-- 功能按钮 start -->
       <el-row class="main-top-group">
@@ -451,12 +451,12 @@
 </script>
 
 <style lang="scss">
-  .el-tree{
+  .sys-menu-class .el-tree{
     height: 400px;
     overflow-y: scroll;
   }
 
-  .el-table__body-wrapper {
+  .sys-menu-class .el-table__body-wrapper {
     overflow-y: auto;
     overflow-x: hidden;
   }

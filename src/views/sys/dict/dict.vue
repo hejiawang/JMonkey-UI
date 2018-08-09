@@ -58,7 +58,7 @@
 
     </div>
 
-    <div class="main-container" :style="dictValueStyle">
+    <div class="main-container sys-dict-card" :style="dictValueStyle">
 
       <!-- 字典类型对应的字典值列表 start -->
       <el-card>
@@ -67,7 +67,7 @@
           <el-button style="float: right; " v-if="sys_dict_value_save" type="primary" plain @click="handleCreateDictValue">新增类型值</el-button>
         </div>
 
-        <el-table :data="dictValueTableData" ref="dictValueTable" tooltip-effect="dark" v-loading="dictValueTableLoading">
+        <el-table :data="dictValueTableData" ref="dictValueTable" height="calc(100% - 60px)" tooltip-effect="dark" v-loading="dictValueTableLoading">
           <el-table-column prop="lable" label="字典标签" show-overflow-tooltip/>
           <el-table-column prop="value" label="字典键值" show-overflow-tooltip/>
           <el-table-column prop="sort" label="字典排序" show-overflow-tooltip/>
@@ -519,7 +519,11 @@
     100% { width:0%;}
   }
 
-  .el-card{
+  .sys-dict-card .el-card{
     height: 100%;
+  }
+
+  .sys-dict-card .el-card__body{
+    height: calc(100% - 50px);
   }
 </style>
