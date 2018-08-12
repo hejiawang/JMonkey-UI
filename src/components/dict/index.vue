@@ -1,10 +1,10 @@
 <template>
-    <el-radio-group v-if=" type == 'radio'" v-model="componentDictValue" @change="handleChange">
+    <el-radio-group v-if=" type == 'radio'" v-model="componentDictValue">
       <template v-for="dictValue in dictValueList">
         <el-radio border :label="dictValue.value">{{dictValue.lable}}</el-radio>
       </template>
     </el-radio-group>
-    <el-select v-else-if=" type == 'select'" v-model="componentDictValue" :placeholder="placeholder" @change="handleChange">
+    <el-select v-else-if=" type == 'select'" v-model="componentDictValue" :placeholder="placeholder">
       <el-option v-for="item in dictValueList" :key="item.id" :label="item.lable" :value="item.value" />
     </el-select>
 </template>
@@ -19,10 +19,6 @@
         type: String,
         required: true
       },
-      defaultValue : {
-        type: String,
-        required: false
-      },
       type: {
         type: String,
         required: false,
@@ -31,6 +27,18 @@
       placeholder: {
         type: String,
         required: false,
+      },
+      value: {
+        type: String,
+        default:""
+      }
+    },
+    watch:{
+      value(val) {
+        this.componentDictValue = val;
+      },
+      componentDictValue(val) {
+        this.$emit('input', val);
       }
     },
     data(){
@@ -42,19 +50,14 @@
     created() {
       this.initDictValue();
     },
+    mounted() {
+      this.componentDictValue = this.value;
+    },
     methods: {
       initDictValue(){
         findValue(this.dictType).then(data => {
           this.dictValueList = data.result;
-
-          if( !validatenull(this.defaultValue) ) {
-            this.componentDictValue = this.defaultValue;
-            this.handleChange();
-          }
         });
-      },
-      handleChange(){
-        this.$emit('input', this.componentDictValue);
       }
     }
   }
